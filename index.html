@@ -37,7 +37,6 @@
         .card { padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; }
         .card-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
         .card-value { font-size: 28px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .trend-indicator { font-size: 16px; font-weight: 800; }
         
         .card.total { background: #ffffff; }
         .card.total .card-title { color: #475569; }
@@ -196,28 +195,24 @@
             <div class="card-title"># Menciones</div>
             <div class="card-value">
                 <span id="count-total">0</span>
-                <span id="trend-total" class="trend-indicator"></span>
             </div>
         </div>
         <div class="card positiva">
             <div class="card-title"># Positivas</div>
             <div class="card-value">
                 <span id="count-pos">0</span>
-                <span id="trend-pos" class="trend-indicator"></span>
             </div>
         </div>
         <div class="card neutra">
             <div class="card-title"># Neutras</div>
             <div class="card-value">
                 <span id="count-neu">0</span>
-                <span id="trend-neu" class="trend-indicator"></span>
             </div>
         </div>
         <div class="card negativa">
             <div class="card-title"># Negativas</div>
             <div class="card-value">
                 <span id="count-neg">0</span>
-                <span id="trend-neg" class="trend-indicator"></span>
             </div>
         </div>
     </div>
@@ -285,7 +280,7 @@
 
     <div class="charts-container">
         <div class="chart-box">
-            <h3>📈 Línea de Tiempo: Historial y Evolución Activa</h3>
+            <h3>📈 Línea de Tiempo: Evolución Dinámica (Últimos 5 días)</h3>
             <div class="chart-wrapper">
                 <canvas id="timelineChart"></canvas>
             </div>
@@ -319,7 +314,7 @@
             <div class="narrative-card critical">
                 <h3 style="color: #b91c1c;">🔴 Focos Críticos de la Jornada (Notas Adversas)</h3>
                 <div id="critical-narratives-list" class="narrative-list">
-                    <div style="color: #64748b; font-size: 11px;">No se registran menciones críticas en los filtros actuales.</div>
+                    <div style="color: #64748b; font-size: 11px;">No se registran menciones críticas in los filtros actuales.</div>
                 </div>
             </div>
             <div class="narrative-card constructive">
@@ -478,12 +473,12 @@
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
+    // Exportación PDF adaptada a Layout Vertical (Portrait) libre de desalineaciones
     function downloadPDF() {
         const elemento = document.getElementById('dashboard-content');
         const btnAyer = document.getElementById('btn-ayer-container');
         btnAyer.style.display = 'none'; 
         
-        // Configuración forzada en Portrait (Vertical) con márgenes seguros
         const opciones = { 
             margin: [0.4, 0.4, 0.4, 0.4], 
             filename: 'Semaforo_MML.pdf', 
@@ -584,7 +579,6 @@
         document.getElementById('count-neu').innerText = countNeu;
         document.getElementById('count-neg').innerText = countNeg;
         
-        calcularYRenderizarTendencias();
         generarAuditoriaNumericaObjetiva(currentFilteredData, countPos, countNeu, countNeg);
         renderizarGraficosYFocos(currentFilteredData, countPos, countNeu, countNeg);
         renderTable(currentFilteredData, horaInput);
@@ -615,7 +609,6 @@
             tTemas.innerHTML = htmlTemas + "</ul>";
         } else { tTemas.innerHTML = "Sin etiquetas en el filtro actual."; }
 
-        // MÓDULO EXCLUSIVAMENTE CRÍTICO
         let mapaMediosNegativos = {}; let totalNotasCriticas = 0;
         data.forEach(r => {
             if(r.tono.toLowerCase().includes('neg')) {
@@ -636,14 +629,13 @@
     }
 
     function renderizarGraficosYFocos(data, pos, neu, neg) {
-        // --- 1. PROCESAR FOCOS NARRATIVOS COMPACTOS ---
         const listaCriticas = document.getElementById('critical-narratives-list');
         const listaPositivas = document.getElementById('positive-narratives-list');
         
         let notasNegativas = data.filter(r => r.tono.toLowerCase().includes('neg')).slice(0, 4);
         let notasPositivas = data.filter(r => r.tono.toLowerCase().includes('pos')).slice(0, 4);
 
-        if(notesNegativas = notasNegativas.length > 0) {
+        if(notasNegativas.length > 0) {
             listaCriticas.innerHTML = '';
             notasNegativas.forEach(r => {
                 listaCriticas.innerHTML += `<div class="narrative-item">` +
@@ -663,10 +655,9 @@
             });
         } else { listaPositivas.innerHTML = `<div style="color: #64748b; font-size: 11px; padding:10px;">No se registran notas favorables.</div>`; }
 
-        // --- 2. RENDER DE GRÁFICO CIRCULAR (SOV) CON MÓDULO DE DATALABELS EXPLICITO ---
+        // 1. RENDERIZAR GRÁFICO DE TORTA (BALANCE ACTIVO)
         if(pieChartInstance) pieChartInstance.destroy();
         const ctxPie = document.getElementById('pieChart').getContext('2d');
-        
         const totalVotos = pos + neu + neg;
 
         pieChartInstance = new Chart(ctxPie, {
@@ -700,39 +691,77 @@
             }
         });
 
-        // --- 3. RENDER DE GRÁFICO DE LÍNEA DE TIEMPO CON DISTINCIÓN DEL DÍA DE HOY ---
-        let mapaFechas = {};
-        allData.slice(0, 200).forEach(r => {
-            if(!mapaFechas[r.fecha]) mapaFechas[r.fecha] = { pos: 0, neu: 0, neg: 0 };
-            const t = r.tono.toLowerCase();
-            if(t.includes('pos')) mapaFechas[r.fecha].pos++;
-            else if(t.includes('neg')) mapaFechas[r.fecha].neg++;
-            else mapaFechas[r.fecha].neu++;
+        // 2. NUEVA LÓGICA DE LÍNEA DE TIEMPO DINÁMICA DE 5 DÍAS BASADA EN FILTROS ACTIVOS
+        // Determinar cuál es el día central objetivo actual (por defecto hoyTime, o la fecha del input de usuario)
+        const fechaInputVal = document.getElementById('filterFecha').value;
+        let baseTime = hoyTime;
+        if ((currentMode === 'specific' || currentMode === 'hoy') && fechaInputVal) {
+            const [yInput, mInput, dInput] = fechaInputVal.split('-');
+            baseTime = new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime();
+        }
+
+        // Generar las 5 fechas exactas consecutivas (Base/Hoy y 4 días anteriores)
+        let ultimos5DiasCompletos = [];
+        for (let i = 4; i >= 0; i--) {
+            ultimos5DiasCompletos.push(baseTime - (i * 24 * 60 * 60 * 1000));
+        }
+
+        // Mapear marcas de tiempo a strings legibles DD/MM
+        function timestampToLabel(ts) {
+            const d = new Date(ts);
+            if (ts === hoyTime) return `HOY (${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')})`;
+            return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }
+
+        let labels5Dias = ultimos5DiasCompletos.map(ts => timestampToLabel(ts));
+
+        // Inicializar contadores vacíos para los 5 días mapeados
+        let mapaConteos5Dias = {};
+        ultimos5DiasCompletos.forEach(ts => {
+            mapaConteos5Dias[ts] = { pos: 0, neu: 0, neg: 0 };
         });
 
-        // Generar etiquetas formateando el día de hoy de forma única
-        let fechasOrdenadas = Object.keys(mapaFechas).sort((a,b) => parseExcelDate(a) - parseExcelDate(b)).slice(-7); 
-        
-        let labelsConHoy = fechasOrdenadas.map(f => {
-            if(parseExcelDate(f) === hoyTime) {
-                return getHoyFormatLabel(); // Devuelve "HOY - DD/MM"
+        // Filtrar y agrupar la data activa que corresponda ÚNICAMENTE a estos filtros secundarios activos
+        // Para que la línea evolutiva refleje los filtros de búsqueda, etiqueta o medio seleccionados.
+        const search = document.getElementById('search').value.toLowerCase();
+        const tono = document.getElementById('filterTono').value;
+        const tipoMedio = document.getElementById('filterTipoMedio').value;
+        const etiquetaActual = document.getElementById('filterEtiqueta').value;
+
+        allData.forEach(row => {
+            const rowTime = parseExcelDate(row.fecha);
+            // Comprobar si pertenece a la ventana de los 5 días que se graficarán
+            if (rowTime && mapaConteos5Dias.hasOwnProperty(rowTime)) {
+                // Aplicar exactamente los mismos filtros de la tabla para ver su evolución real
+                const matchSearch = search === "" || (row.titular + " " + row.resumen).toLowerCase().includes(search);
+                const matchTono = tono === "" || row.tono === tono;
+                const matchTipoMedio = tipoMedio === "" || row.tipoMedio === tipoMedio;
+                const matchEtiqueta = etiquetaActual === "" || row.etiqueta === etiquetaActual;
+
+                if (matchSearch && matchTono && matchTipoMedio && matchEtiqueta) {
+                    const t = row.tono.toLowerCase();
+                    if(t.includes('pos')) mapaConteos5Dias[rowTime].pos++;
+                    else if(t.includes('neg')) mapaConteos5Dias[rowTime].neg++;
+                    else mapaConteos5Dias[rowTime].neu++;
+                }
             }
-            return f;
         });
 
+        // Estructurar arrays de salida ordenados para ChartJS
         let dataLinePos = [], dataLineNeu = [], dataLineNeg = [];
-        fechasOrdenadas.forEach(f => {
-            dataLinePos.push(mapaFechas[f].pos);
-            dataLineNeu.push(mapaFechas[f].neu);
-            dataLineNeg.push(mapaFechas[f].neg);
+        ultimos5DiasCompletos.forEach(ts => {
+            dataLinePos.push(mapaConteos5Dias[ts].pos);
+            dataLineNeu.push(mapaConteos5Dias[ts].neu);
+            dataLineNeg.push(mapaConteos5Dias[ts].neg);
         });
 
+        // Reconstruir gráfico lineal
         if(timelineChartInstance) timelineChartInstance.destroy();
         const ctxLine = document.getElementById('timelineChart').getContext('2d');
         timelineChartInstance = new Chart(ctxLine, {
             type: 'line',
             data: {
-                labels: labelsConHoy,
+                labels: labels5Dias,
                 datasets: [
                     { label: 'Positivas', data: dataLinePos, borderColor: '#15803d', backgroundColor: '#86efac', tension: 0.15 },
                     { label: 'Neutras', data: dataLineNeu, borderColor: '#a16207', backgroundColor: '#fde047', tension: 0.15 },
@@ -742,12 +771,12 @@
             options: {
                 responsive: true, maintainAspectRatio: false,
                 scales: { 
-                    y: { beginAtZero: true, ticks: { font: { size: 9 } } }, 
+                    y: { beginAtZero: true, ticks: { font: { size: 9 }, stepSize: 1 } }, 
                     x: { ticks: { font: { size: 9, weight: (context) => context.tick && context.tick.label && context.tick.label.includes('HOY') ? 'bold' : 'normal' } } } 
                 },
                 plugins: { 
                     legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } },
-                    datalabels: { display: false } // Desactivar números encimados para la línea de tiempo
+                    datalabels: { display: false }
                 }
             }
         });
@@ -818,26 +847,6 @@
         navigator.clipboard.writeText(textoWA).then(() => { alert("📋 ¡Resumen compacto copiado con éxito!"); }).catch(err => { alert("Error: " + err); });
     }
 
-    function calcularYRenderizarTendencias() {
-        let hTotal = 0, hPos = 0, hNeu = 0, hNeg = 0; let aTotal = 0, aPos = 0, aNeu = 0, aNeg = 0;
-        allData.forEach(row => {
-            const t = parseExcelDate(row.fecha); if (!t) return;
-            const tonoLow = row.tono.toLowerCase();
-            if (t === hoyTime) { hTotal++; if (tonoLow.includes('pos')) hPos++; else if (tonoLow.includes('neg')) hNeg++; else hNeu++; } 
-            else if (t === ayerTime) { aTotal++; if (tonoLow.includes('pos')) aPos++; else if (tonoLow.includes('neg')) aNeg++; else aNeu++; }
-        });
-        inyectarFlecha('trend-total', hTotal, aTotal, 'neutro'); inyectarFlecha('trend-pos', hPos, aPos, 'positivo');
-        inyectarFlecha('trend-neu', hNeu, aNeu, 'neutro'); inyectarFlecha('trend-neg', hNeg, aNeg, 'negativo');
-    }
-
-    function inyectarFlecha(idElemento, conteoHoy, conteoAyer, tipoTono) {
-        const el = document.getElementById(idElemento); if (!el) return;
-        if (conteoHoy === 0 && conteoAyer === 0) { el.innerHTML = ""; return; }
-        if (conteoHoy > conteoAyer) { el.innerHTML = " ▲"; el.style.color = (tipoTono === 'positivo') ? '#16a34a' : (tipoTono === 'negativo' ? '#dc2626' : '#475569'); } 
-        else if (conteoHoy < conteoAyer) { el.innerHTML = " ▼"; el.style.color = (tipoTono === 'positivo') ? '#dc2626' : (tipoTono === 'negativo' ? '#16a34a' : '#475569'); } 
-        else { el.innerHTML = " ="; el.style.color = "#64748b"; }
-    }
-
     /* MÓDULO DE IA INTERACTIVA */
     function obtenerApiKeysArray() {
         let keysRaw = localStorage.getItem('gemini_api_key_mml');
@@ -862,7 +871,7 @@
         agregarSpinner(); procesarConIA(chatContext);
     }
     function enviarPromptRapido(titulo, promptOculto) { agregarBurbuja(titulo, "user"); agregarSpinner(); construirPromptInicial(); procesarConIA([{ role: "user", parts: [{ text: promptInicialIA + "\n\nTAREA: " + promptOculto }] }], true); }
-    function agregarBurbuja(texto, sender) { const ch = document.getElementById('chat-history'); const div = document.createElement('div'); div.className = `chat-bubble bubble-${sender}`; div.innerHTML = sender === 'ia' ? convertirMarkdownAModal(texto) : texto; ch.appendChild(div); ch.scrollTop = ch.scrollHeight; }
+    function agregarBurbuja(texto, sender) { const ch = document.getElementById('chat-history'); const div = document.createElement('div'); div.id = sender === 'ia' ? convertirMarkdownAModal(texto) : texto; ch.appendChild(div); ch.scrollTop = ch.scrollHeight; }
     function agregarSpinner() { const div = document.createElement('div'); div.id = "temp-spinner"; div.className = "loading-ia"; div.innerHTML = `<div class="spinner"></div>`; document.getElementById('chat-history').appendChild(div); document.getElementById('btnSend').disabled = true; }
     function quitarSpinner() { const s = document.getElementById('temp-spinner'); if (s) s.remove(); document.getElementById('btnSend').disabled = false; }
     async function procesarConIA(historialAEnviar, esBotonRapido = false) {
