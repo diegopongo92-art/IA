@@ -107,8 +107,8 @@
     async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
         document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #64748b; font-style: italic;'>Analizando coyuntura nacional con Google Search en tiempo real...</span>";
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
+const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
         const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
             medio: nota.medio,
             titulo: nota.titular || nota.titulo,
