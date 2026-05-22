@@ -123,7 +123,7 @@
         document.getElementById('tabla-contenedor').innerHTML = html;
     }
 
-    // 🤖 URL OFICIAL CORREGIDA PARA LA API v1 ESTABLE
+    // 🤖 ACTUALIZACIÓN DE SEGURIDAD CON EL ENLACE COMPATIBLE GEMINI PRO
     async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
         if (!noticiasParaAnalizar || noticiasParaAnalizar.length === 0) {
             document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #64748b; font-style: italic;'>No hay noticias suficientes para estructurar un análisis de coyuntura.</span>";
@@ -132,8 +132,8 @@
 
         document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #3b82f6; font-style: italic;'>El analista político está procesando el impacto institucional en vivo...</span>";
 
-        // MÁXIMA COMPATIBILIDAD: Ruta v1 + nombre del modelo limpio
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // Cambiamos al endpoint oficial 'gemini-1.5-pro' que es el estándar global para cuentas estables v1
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${apiKey}`;
 
         const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
             medio: nota.medio || "Prensa",
