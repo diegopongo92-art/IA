@@ -74,19 +74,15 @@
 </div>
 
 <script>
-    // Tu lógica de conexión a Google Sheets se mantiene intacta
     let todasLasNoticias = [];
 
     function init() {
-        // Datos de respaldo para pruebas rápidas
         todasLasNoticias = [
             { medio: "El Comercio", titular: "Municipalidad de Lima acelera obras en Vía Expresa Sur", tono: "Positivo", resumen: "Trabajos avanzan en beneficio de los distritos del sur." },
             { medio: "La República", titular: "Vecinos protestan por desvíos en obras de Lima Centro", tono: "Negativo", resumen: "Comerciantes exigen mayor celeridad en la apertura de avenidas." },
             { medio: "Gestión", titular: "MML anuncia plan de inversión para modernizar seguridad ciudadana", tono: "Neutral", resumen: "Se implementarán nuevas cámaras con reconocimiento facial." }
         ];
         renderTable(todasLasNoticias);
-        
-        // Ejecutamos la IA de forma segura
         activarAnalistaPoliticoIA(todasLasNoticias);
     }
 
@@ -100,11 +96,9 @@
         document.getElementById('tabla-contenedor').innerHTML = html;
     }
 
-    // 🔥 LA FUNCIÓN CLAVE: Llama a tu función backend de Vercel sin exponer nada en el navegador
     async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
-        document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #94a3b8; font-style: italic;'>Analizando contexto nacional en tiempo real de forma segura...</span>";
+        document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #94a3b8; font-style: italic;'>Analizando contexto nacional en tiempo real...</span>";
 
-        // Filtramos y preparamos solo lo esencial para optimizar la carga
         const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
             medio: nota.medio,
             titulo: nota.titular || nota.titulo,
@@ -113,7 +107,7 @@
         }));
 
         try {
-            // Hacemos la consulta interna al servidor seguro de Vercel
+            // Llama a tu backend de Vercel (recuerda cambiar googleSearchGrounding por googleSearch en tu api/analizar.js si usas backend)
             const response = await fetch('/api/analizar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -122,17 +116,16 @@
 
             const responseData = await response.json();
             
-            // Evaluamos la respuesta que nos trae el backend
             if (responseData.candidates && responseData.candidates.length > 0) {
                 const textoAnalisis = responseData.candidates[0].content.parts[0].text;
                 document.getElementById('caja-analisis-ia').innerHTML = textoAnalisis;
             } else {
-                console.error("Respuesta del servidor:", responseData);
-                const msgError = responseData.error?.message || "Error en la respuesta de los servidores de Google.";
+                console.error("Respuesta:", responseData);
+                const msgError = responseData.error?.message || "Error al procesar la información estructural.";
                 document.getElementById('caja-analisis-ia').innerHTML = `<em>El analista reporta un inconveniente: ${msgError}</em>`;
             }
         } catch (error) {
-            console.error("Error en la conexión frontend-backend:", error);
+            console.error("Error:", error);
             document.getElementById('caja-analisis-ia').innerHTML = "<em>Error al conectar con el servidor de análisis político.</em>";
         }
     }
