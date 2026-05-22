@@ -31,10 +31,6 @@
         .btn-pdf { background: #ef4444; }
         .btn-ia { background: #8b5cf6; } 
         .btn-whatsapp { background: #22c55e; }
-        
-        /* Switch de Crisis Exclusivo */
-        .crisis-switch-container { display: flex; align-items: center; gap: 8px; background: #fee2e2; border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; color: #991b1b; text-transform: uppercase; cursor: pointer; }
-        .crisis-switch-container input { cursor: pointer; width: auto; margin: 0; }
 
         /* Tarjetas de Resumen */
         .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
@@ -89,20 +85,31 @@
         .automated-text { font-size: 12px; line-height: 1.6; color: #0f172a; font-weight: 600; }
         .automated-text ul { margin: 5px 0 0 0; padding-left: 18px; }
 
-        /* GRÁFICOS Y FOCOS DEL REPORTE DE CRISIS */
+        /* GRÁFICOS Y FOCOS - OPTIMIZADOS CONTRA DESALINEACIÓN */
         .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 25px; page-break-inside: avoid; }
-        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 280px; display: flex; flex-direction: column; justify-content: space-between; }
+        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 280px; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; }
         .chart-box h3 { font-size: 12px; font-weight: 800; color: #475569; margin: 0 0 10px 0; text-transform: uppercase; }
         .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
 
         .narratives-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; page-break-inside: avoid; }
-        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); page-break-inside: avoid; }
         .narrative-card.critical { border-left: 5px solid #ef4444; }
         .narrative-card.constructive { border-left: 5px solid #10b981; }
         .narrative-card h3 { font-size: 12px; font-weight: 800; margin: 0 0 12px 0; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
         .narrative-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
         .narrative-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; font-weight: 600; line-height: 1.4; }
         .narrative-meta { font-size: 10px; color: #64748b; font-weight: 700; margin-top: 4px; text-transform: uppercase; display: flex; justify-content: space-between; }
+
+        /* REGLAS ESTRICTAS DE IMPRESIÓN PARA ELIMINAR DESALINEACIONES */
+        @media print, .html2pdf__page-break {
+            .charts-container { display: block !important; width: 100% !important; }
+            .chart-box { display: block !important; width: 100% !important; margin-bottom: 20px !important; height: 300px !important; page-break-inside: avoid !important; }
+            .narratives-container { display: block !important; width: 100% !important; }
+            .narrative-card { display: block !important; width: 100% !important; margin-bottom: 20px !important; page-break-inside: avoid !important; }
+            .insights-grid { display: block !important; width: 100% !important; }
+            .insight-box { display: block !important; width: 100% !important; margin-bottom: 12px !important; page-break-inside: avoid !important; }
+            .summary-cards { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+        }
 
         /* Ventana Modal IA */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
@@ -177,9 +184,6 @@
 <div class="main" id="dashboard-content">
     
     <div class="actions-bar" data-html2canvas-ignore="true">
-        <label class="crisis-switch-container">
-            <input type="checkbox" id="crisisOnlySwitch" onchange="runFilters()"> 🚨 Exclusivo Crisis
-        </label>
         <button class="btn-extra btn-whatsapp" onclick="copiarWhatsApp()">📋 Copiar WhatsApp</button>
         <button class="btn-extra btn-ia" onclick="abrirAnalistaIA()">🤖 Analizar con IA</button>
         <button class="btn-extra btn-reset" onclick="resetFilters()">🔄 Restablecer Filtros</button>
@@ -454,7 +458,6 @@
     function changeFilterTipoMedio() { runFilters(); }
     
     function resetFilters() {
-        document.getElementById('crisisOnlySwitch').checked = false;
         const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
         document.getElementById('search').value = ''; document.getElementById('filterFecha').value = `${y}-${m}-${d}`; document.getElementById('filterHora').value = '';
         document.getElementById('filterEtiqueta').value = ''; document.getElementById('filterTono').value = ''; document.getElementById('filterTipoMedio').value = '';
@@ -479,7 +482,16 @@
         const elemento = document.getElementById('dashboard-content');
         const btnAyer = document.getElementById('btn-ayer-container');
         btnAyer.style.display = 'none'; 
-        const opciones = { margin: 0.3, filename: 'Semaforo_MML.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
+        
+        // Configuración forzada en Portrait (Vertical) con márgenes seguros
+        const opciones = { 
+            margin: [0.4, 0.4, 0.4, 0.4], 
+            filename: 'Semaforo_MML.pdf', 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2, useCORS: true }, 
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+        };
+        
         html2pdf().set(opciones).from(elemento).save().then(() => { if(currentMode === 'hoy') btnAyer.style.display = 'block'; });
     }
 
@@ -516,7 +528,6 @@
     function runFilters() {
         const search = document.getElementById('search').value.toLowerCase(), tono = document.getElementById('filterTono').value, tipoMedio = document.getElementById('filterTipoMedio').value;
         const fechaInput = document.getElementById('filterFecha').value, horaInput = document.getElementById('filterHora').value, etiquetaPrevia = document.getElementById('filterEtiqueta').value;
-        const crisisOnly = document.getElementById('crisisOnlySwitch').checked;
 
         let minMinutes = -1;
         if (horaInput) { const [hInput, mInput] = horaInput.split(':'); minMinutes = parseInt(hInput, 10) * 60 + parseInt(mInput, 10); }
@@ -548,8 +559,6 @@
         currentFilteredData = dateFiltered.filter(row => {
             const matchSearch = search === "" || (row.titular + " " + row.resumen).toLowerCase().includes(search);
             let matchTono = tono === "" || row.tono === tono;
-            if (crisisOnly) matchTono = row.tono.toLowerCase().includes('neg'); // Sobreescribe si está activo el switch de crisis
-            
             const matchTipoMedio = tipoMedio === "" || row.tipoMedio === tipoMedio;
             const matchEtiqueta = etiquetaActual === "" || row.etiqueta === etiquetaActual;
             let matchHora = true;
@@ -634,7 +643,7 @@
         let notasNegativas = data.filter(r => r.tono.toLowerCase().includes('neg')).slice(0, 4);
         let notasPositivas = data.filter(r => r.tono.toLowerCase().includes('pos')).slice(0, 4);
 
-        if(notasNegativas.length > 0) {
+        if(notesNegativas = notasNegativas.length > 0) {
             listaCriticas.innerHTML = '';
             notasNegativas.forEach(r => {
                 listaCriticas.innerHTML += `<div class="narrative-item">` +
