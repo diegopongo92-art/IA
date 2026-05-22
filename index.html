@@ -8,7 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root { 
@@ -17,9 +20,10 @@
             --accent: #2563eb; 
         }
         
-        /* Tipografía Premium Aplicada Globalmente */
+        /* Tipografía Premium y Estructura Base */
         * {
-            font-family: 'Inter', sans-serif !important;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            box-sizing: border-box;
         }
         
         body { 
@@ -44,7 +48,7 @@
         .header-logo { height: 40px; background-color: white; padding: 5px 10px; border-radius: 6px; object-fit: contain; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .header-credits { font-size: 11px; color: #94a3b8; margin-top: 2px; font-weight: 600; }
         
-        .main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        .main { max-width: 1250px; margin: 20px auto; padding: 0 20px; }
 
         /* Barra de Acciones */
         .actions-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
@@ -60,8 +64,8 @@
         /* Tarjetas de Resumen */
         .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
         .card { padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; }
-        .card-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
-        .card-value { font-size: 28px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .card-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
+        .card-value { font-size: 32px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; }
         
         .card.total { background: #ffffff; }
         .card.total .card-title { color: #475569; }
@@ -76,7 +80,7 @@
         /* Controles de Filtro */
         .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: grid; gap: 15px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        select, input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
         
         .date-controls { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
         .date-controls input[type="date"] { flex: 1; min-width: 130px; }
@@ -89,50 +93,49 @@
         .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 25px; }
         table { width: 100%; border-collapse: collapse; min-width: 100%; table-layout: fixed; word-wrap: break-word; }
         tr { page-break-inside: avoid; break-inside: avoid; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 11px; color: #64748b; border-bottom: 1px solid #eee; text-transform: uppercase; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 12px; font-weight: 700; color: #64748b; border-bottom: 1px solid #eee; text-transform: uppercase; }
         td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 13px; line-height: 1.5; color: #0f172a; vertical-align: top; }
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .badge-positivo { background: #15803d; color: white; }
         .badge-negativo { background: #b91c1c; color: white; }
         .badge-neutro { background: #a16207; color: white; }
         
-        /* BOTÓN DE NOTA PERFECTO: Ocupa todo el largo disponible verticalmente */
-        .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: block; width: 100%; text-align: center; box-sizing: border-box; text-transform: uppercase; transition: background 0.2s; }
+        .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: block; width: 100%; text-align: center; text-transform: uppercase; transition: background 0.2s; }
         .btn-link:hover { background: #1d4ed8; }
 
         /* Sección de Indicadores Numéricos */
-        .insights-section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); page-break-inside: avoid; }
-        .insights-header { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 15px; }
+        .insights-section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .insights-header { font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 15px; }
         .insights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .insight-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; page-break-inside: avoid; }
-        .insight-box h4 { margin: 0 0 10px 0; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
-        .automated-text { font-size: 12px; line-height: 1.6; color: #0f172a; font-weight: 600; }
+        .insight-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
+        .insight-box h4 { margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
+        .automated-text { font-size: 13px; line-height: 1.6; color: #0f172a; font-weight: 600; }
         .automated-text ul { margin: 5px 0 0 0; padding-left: 18px; }
 
-        /* Gráficos Estructurados Correctamente */
-        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 25px; page-break-inside: avoid; }
-        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 280px; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; box-sizing: border-box; }
-        .chart-box h3 { font-size: 12px; font-weight: 800; color: #475569; margin: 0 0 10px 0; text-transform: uppercase; }
+        /* Gráficos Estructurados */
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 300px; display: flex; flex-direction: column; justify-content: space-between; }
+        .chart-box h3 { font-size: 13px; font-weight: 800; color: #475569; margin: 0 0 10px 0; text-transform: uppercase; }
         .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
 
-        .narratives-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; page-break-inside: avoid; }
-        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); page-break-inside: avoid; box-sizing: border-box; }
+        .narratives-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .narrative-card.critical { border-left: 5px solid #ef4444; }
         .narrative-card.constructive { border-left: 5px solid #10b981; }
-        .narrative-card h3 { font-size: 12px; font-weight: 800; margin: 0 0 12px 0; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
-        .narrative-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
-        .narrative-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; font-weight: 600; line-height: 1.4; }
-        .narrative-meta { font-size: 10px; color: #64748b; font-weight: 700; margin-top: 4px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+        .narrative-card h3 { font-size: 13px; font-weight: 800; margin: 0 0 12px 0; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .narrative-list { display: flex; flex-direction: column; gap: 8px; font-size: 13px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .narrative-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-weight: 600; line-height: 1.4; }
+        .narrative-meta { font-size: 11px; color: #64748b; font-weight: 700; margin-top: 6px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Reglas de Impresión - Sin Desalineaciones */
+        /* Reglas de Impresión */
         @media print {
             .charts-container { display: block !important; width: 100% !important; }
-            .chart-box { display: block !important; width: 100% !important; margin-bottom: 25px !important; height: 320px !important; page-break-inside: avoid !important; float: none !important; }
+            .chart-box { display: block !important; width: 100% !important; margin-bottom: 25px !important; height: 320px !important; page-break-inside: avoid !important; }
             .narratives-container { display: block !important; width: 100% !important; }
-            .narrative-card { display: block !important; width: 100% !important; margin-bottom: 20px !important; page-break-inside: avoid !important; float: none !important; }
+            .narrative-card { display: block !important; width: 100% !important; margin-bottom: 20px !important; page-break-inside: avoid !important; }
             .insights-grid { display: block !important; width: 100% !important; }
-            .insight-box { display: block !important; width: 100% !important; margin-bottom: 15px !important; page-break-inside: avoid !important; float: none !important; }
+            .insight-box { display: block !important; width: 100% !important; margin-bottom: 15px !important; page-break-inside: avoid !important; }
             .summary-cards { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
         }
 
@@ -144,41 +147,43 @@
             table, thead, tbody, th, td, tr { display: block; }
             thead tr { display: none; }
             .table-box { border: none; background: transparent; }
-            tr { margin-bottom: 12px; border-radius: 10px; border: 1px solid #cbd5e1; padding: 12px; display: flex; flex-wrap: wrap; gap: 8px 0; }
-            td { padding: 0; border: none; text-align: left !important; width: 100% !important; box-sizing: border-box; }
-            td:nth-child(1) { width: 50% !important; order: 1; font-size: 11px; }
+            tr { margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; padding: 15px; display: flex; flex-wrap: wrap; gap: 10px 0; }
+            td { padding: 0; border: none; text-align: left !important; width: 100% !important; }
+            td:nth-child(1) { width: 50% !important; order: 1; font-size: 12px; }
             td:nth-child(3) { width: 50% !important; order: 2; text-align: right !important; }
             td:nth-child(2) { width: 100% !important; order: 3; }
-            td:nth-child(4) { width: 100% !important; order: 4; font-size: 12px; margin-top: 5px; }
+            td:nth-child(4) { width: 100% !important; order: 4; font-size: 13px; margin-top: 5px; }
             td:nth-child(5) { width: 100% !important; order: 5; margin-top: 10px; }
-            .quick-prompts-container { overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
         }
         
-        /* Modal IA Completo Restaurado */
+        /* Modal IA Súper Estable */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         .modal-content { background-color: #ffffff; padding: 25px; border-radius: 16px; width: 95%; max-width: 900px; height: 90vh; max-height: 850px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px; flex-shrink: 0; }
-        .modal-title { font-size: 1.2rem; font-weight: 800; color: #002f80; display: flex; align-items: center; gap: 8px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; flex-shrink: 0; }
+        .modal-title { font-size: 1.3rem; font-weight: 800; color: #002f80; display: flex; align-items: center; gap: 8px; }
         .modal-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-icon { background: #cbd5e1; color: #334155; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-icon { background: #cbd5e1; color: #334155; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
         .btn-icon:hover { background: #94a3b8; color: white; }
-        .close-modal { font-size: 24px; font-weight: bold; color: #64748b; cursor: pointer; transition: color 0.2s; }
+        .close-modal { font-size: 28px; font-weight: bold; color: #64748b; cursor: pointer; transition: color 0.2s; line-height: 1; }
         .close-modal:hover { color: #1e293b; }
         
         #chat-history { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-        .chat-bubble { padding: 15px; border-radius: 10px; font-size: 14px; line-height: 1.6; max-width: 90%; }
-        .bubble-ia { background: #f8fafc; border: 1px solid #e2e8f0; color: #334155; align-self: flex-start; }
+        .chat-bubble { padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; max-width: 90%; }
+        .bubble-ia { background: #f8fafc; border: 1px solid #e2e8f0; color: #1e293b; align-self: flex-start; }
         .bubble-user { background: #8b5cf6; color: white; align-self: flex-end; font-weight: 600; }
+        
         .quick-prompts-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; flex-shrink: 0; }
-        .btn-quick-prompt { background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-quick-prompt { background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .btn-quick-prompt:hover { background: #8b5cf6; color: white; border-color: #8b5cf6; transform: translateY(-1px); }
+        
         .chat-input-container { display: flex; gap: 10px; border-top: 2px solid #f1f5f9; padding-top: 15px; flex-shrink: 0; }
-        .chat-input { flex-grow: 1; padding: 12px 15px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .chat-input { flex-grow: 1; padding: 14px 15px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s; }
         .chat-input:focus { border-color: #8b5cf6; }
-        .btn-send-chat { background: #8b5cf6; color: white; border: none; padding: 0 20px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; transition: opacity 0.2s; }
+        .btn-send-chat { background: #8b5cf6; color: white; border: none; padding: 0 25px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; transition: opacity 0.2s; }
         .btn-send-chat:hover { opacity: 0.9; }
         .btn-send-chat:disabled { background: #cbd5e1; cursor: not-allowed; }
-        .loading-ia { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #8b5cf6; font-weight: 600; gap: 10px; text-align: center; }
+        
+        .loading-ia { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #8b5cf6; font-weight: 700; gap: 10px; text-align: center; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #8b5cf6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -191,11 +196,11 @@
     <div class="header-left">
         <img src="643cae93-18fd-40de-9f6c-a08884372e18.png" alt="Logo MML" class="header-logo">
         <div>
-            <h1 style="font-size: 1.1rem; color: white; font-weight: 800; margin:0; line-height: 1.2;">SEMÁFORO DE MEDIOS MML</h1>
+            <h1 style="font-size: 18px; color: white; font-weight: 800; margin:0; line-height: 1.2;">SEMÁFORO DE MEDIOS MML</h1>
             <div class="header-credits">Desarrollado por Diego Pongo y Mariel Ramírez</div>
         </div>
     </div>
-    <div id="data-count" style="font-size: 12px; font-weight: 600; color: #cbd5e1; text-align:right;">Conectando...</div>
+    <div id="data-count" style="font-size: 13px; font-weight: 700; color: #cbd5e1; text-align:right;">Conectando...</div>
 </header>
 
 <div class="main" id="dashboard-content">
@@ -269,10 +274,10 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 10%;">Fecha</th>
+                    <th style="width: 12%;">Fecha</th>
                     <th style="width: 25%;">Titular / Medio</th>
                     <th style="width: 10%;">Tono</th>
-                    <th style="width: 45%;">Resumen</th>
+                    <th style="width: 43%;">Resumen</th>
                     <th style="width: 10%;">Enlace</th>
                 </tr>
             </thead>
@@ -282,7 +287,7 @@
         </table>
     </div>
 
-    <div id="btn-ayer-container" style="text-align: center; margin-top: 15px; margin-bottom: 15px; display: none;" data-html2canvas-ignore="true">
+    <div id="btn-ayer-container" style="text-align: center; margin-top: 15px; margin-bottom: 25px; display: none;" data-html2canvas-ignore="true">
         <button id="btn-ayer" class="btn-action bg-gray" style="padding: 10px 20px; font-size: 12px; border-radius: 8px;" onclick="toggleAyer()">
             ➖ Ocultar notas de ayer
         </button>
@@ -324,13 +329,13 @@
             <div class="narrative-card critical">
                 <h3 style="color: #b91c1c;">🔴 Focos Críticos de la Jornada (Notas Adversas)</h3>
                 <div id="critical-narratives-list" class="narrative-list">
-                    <div style="color: #64748b; font-size: 11px;">No se registran menciones críticas.</div>
+                    <div style="color: #64748b; font-size: 12px;">No se registran menciones críticas.</div>
                 </div>
             </div>
             <div class="narrative-card constructive">
                 <h3 style="color: #0f5132;">🟢 Focos Constructivos de la Jornada (Notas Favorables)</h3>
                 <div id="positive-narratives-list" class="narrative-list">
-                    <div style="color: #64748b; font-size: 11px;">No se registran menciones positivas.</div>
+                    <div style="color: #64748b; font-size: 12px;">No se registran menciones positivas.</div>
                 </div>
             </div>
         </div>
@@ -342,8 +347,8 @@
         <div class="modal-header">
             <div class="modal-title">🤖 Analista Político IA</div>
             <div class="modal-actions">
-                <button class="btn-icon" onclick="limpiarChat()">🧹 Limpiar Pantalla</button>
-                <button class="btn-icon" onclick="borrarApiKey()">🔑 API Key</button>
+                <button class="btn-icon" onclick="limpiarChat()">🧹 Limpiar Chat</button>
+                <button class="btn-icon" onclick="gestionarApiKey()">🔑 API Key</button>
                 <span class="close-modal" onclick="cerrarModal()">&times;</span>
             </div>
         </div>
@@ -375,7 +380,6 @@
     let mostrarAyer = true; 
     let timelineChartInstance = null;
     let pieChartInstance = null;
-    let chatContext = [];
 
     async function init() {
         try {
@@ -563,7 +567,7 @@
         
         generarAuditoriaNumericaObjetiva(currentFilteredData, countPos, countNeu, countNeg);
         renderizarGraficosYFocos(currentFilteredData, countPos, countNeu, countNeg);
-        renderTable(currentFilteredData, horaInput);
+        renderTable(currentFilteredData);
     }
 
     function generarAuditoriaNumericaObjetiva(data, pos, neu, neg) {
@@ -597,12 +601,12 @@
         let notasNegativas = data.filter(r => r.tono.toLowerCase().includes('neg')).slice(0, 4);
         let notasPositivas = data.filter(r => r.tono.toLowerCase().includes('pos')).slice(0, 4);
 
-        listaCriticas.innerHTML = notasNegativas.length > 0 ? '' : `<div style="color:#64748b; font-size:11px; padding:10px;">No se registran notas adversas.</div>`;
+        listaCriticas.innerHTML = notasNegativas.length > 0 ? '' : `<div style="color:#64748b; font-size:12px; padding:10px;">No se registran notas adversas.</div>`;
         notasNegativas.forEach(r => {
             listaCriticas.innerHTML += `<div class="narrative-item"><div>${r.titular}</div><div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver ↗</a></div></div>`;
         });
 
-        listaPositivas.innerHTML = notasPositivas.length > 0 ? '' : `<div style="color:#64748b; font-size:11px; padding:10px;">No se registran notas favorables.</div>`;
+        listaPositivas.innerHTML = notasPositivas.length > 0 ? '' : `<div style="color:#64748b; font-size:12px; padding:10px;">No se registran notas favorables.</div>`;
         notasPositivas.forEach(r => {
             listaPositivas.innerHTML += `<div class="narrative-item"><div>${r.titular}</div><div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver ↗</a></div></div>`;
         });
@@ -613,36 +617,9 @@
             type: 'doughnut',
             data: { 
                 labels: ['Positivas', 'Neutras', 'Negativas'], 
-                datasets: [{ 
-                    data: [pos, neu, neg], 
-                    backgroundColor: ['#86efac', '#fde047', '#fc8181'], 
-                    borderColor: ['#4ade80', '#facc15', '#f87171'], 
-                    borderWidth: 1 
-                }] 
+                datasets: [{ data: [pos, neu, neg], backgroundColor: ['#86efac', '#fde047', '#fc8181'], borderColor: ['#4ade80', '#facc15', '#f87171'], borderWidth: 1 }] 
             },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { 
-                        position: 'right', 
-                        labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } 
-                    }, 
-                    datalabels: { 
-                        display: true, 
-                        color: '#0f172a', 
-                        font: { family: 'Inter', weight: '800', size: 11 }, 
-                        formatter: (value, ctx) => {
-                            let datasets = ctx.chart.data.datasets;
-                            let sum = 0;
-                            datasets.map(data => { sum += data.data.reduce((a, b) => a + b, 0); });
-                            if (value === 0 || sum === 0) return '';
-                            let percentage = ((value / sum) * 100).toFixed(0) + '%';
-                            return percentage;
-                        } 
-                    } 
-                } 
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { family: 'Inter', size: 11, weight: 'bold' } } }, datalabels: { display: true, color: '#0f172a', font: { family: 'Inter', weight: '800', size: 12 }, formatter: (value, ctx) => { let sum = 0; ctx.chart.data.datasets.map(data => { sum += data.data.reduce((a, b) => a + b, 0); }); if (value === 0 || sum === 0) return ''; return ((value / sum) * 100).toFixed(0) + '%'; } } } }
         });
 
         const fechaInputVal = document.getElementById('filterFecha').value;
@@ -677,7 +654,7 @@
         });
     }
 
-    function renderTable(data, horaInput) {
+    function renderTable(data) {
         const tbody = document.getElementById('table-body'); tbody.innerHTML = '';
         document.getElementById('data-count').innerText = `Menciones encontradas: ${data.length}`;
         if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b;">No hay noticias bajo el criterio actual.</td></tr>`; return; }
@@ -690,26 +667,24 @@
             
             const linkHTML = row.link.includes('http') ? `<a href="${row.link}" target="_blank" class="btn-link">Abrir Nota</a>` : `<span style="color:#64748b; font-size:11px;">Sin Enlace</span>`;
             
-            // LÓGICA DE HORA REGISTRADA CORREGIDA
             let horaRegistro = "";
             if(row.marcaTemporal) { 
                 const parts = row.marcaTemporal.trim().split(/\s+/); 
                 if(parts.length >= 2) {
-                    let horaStr = parts.slice(1).join(' '); // Captura todo después de la fecha (ej: 10:30:00 a.m.)
-                    horaRegistro = `<div style="font-size:10px; color:rgba(0,0,0,0.65); font-weight:600; margin-top:4px;">Registrado: ${horaStr}</div>`; 
+                    let horaStr = parts.slice(1).join(' '); 
+                    horaRegistro = `<div style="font-size:11px; color:rgba(0,0,0,0.65); font-weight:700; margin-top:4px;">Registrado:<br>${horaStr}</div>`; 
                 }
             }
 
-            // TIPO DE MEDIO ENTRE PARÉNTESIS CORREGIDO
             tbody.innerHTML += `
                 <tr style="${rowStyle}">
                     <td data-label="Fecha">
-                        <div style="font-weight:700;">${row.fecha}</div>
+                        <div style="font-weight:800;">${row.fecha}</div>
                         ${horaRegistro}
                     </td>
                     <td data-label="Noticia">
-                        <div style="font-weight:800; margin-bottom:5px; font-size:13px;">${row.titular}</div>
-                        <div style="font-size:10px; color:var(--primary); font-weight:800;">${row.medio} (${row.tipoMedio})</div>
+                        <div style="font-weight:800; margin-bottom:5px; font-size:14px;">${row.titular}</div>
+                        <div style="font-size:11px; color:var(--primary); font-weight:800; text-transform:uppercase;">${row.medio} (${row.tipoMedio})</div>
                     </td>
                     <td data-label="Tono"><span class="badge ${badgeClass}">${row.tono}</span></td>
                     <td data-label="Resumen" style="font-weight:600;">${row.resumen}</td>
@@ -725,24 +700,36 @@
         navigator.clipboard.writeText(textoWA).then(() => alert("📋 Copiado al portapapeles."));
     }
 
-    // --- LÓGICA DE CHAT IA RESTAURADA ---
+    // --- IA TOTALMENTE CORREGIDA Y ROBUSTA ---
     function obtenerApiKeysArray() {
         let keysRaw = localStorage.getItem('gemini_api_key_mml');
-        if (!keysRaw) { 
-            keysRaw = prompt("Para usar el Analista IA, ingresa tu API Key de Google Gemini:"); 
-            if (keysRaw) localStorage.setItem('gemini_api_key_mml', keysRaw.trim()); 
-        }
-        return keysRaw ? keysRaw.split(',').map(k => k.trim()).filter(k => k !== "") : [];
+        if (!keysRaw) return [];
+        return keysRaw.split(',').map(k => k.trim()).filter(k => k !== "");
     }
     
-    function borrarApiKey() { 
-        localStorage.removeItem('gemini_api_key_mml'); 
-        alert("API Key borrada. Se te pedirá de nuevo la próxima vez que abras el chat."); 
-        cerrarModal(); 
+    function gestionarApiKey() { 
+        let currentKey = localStorage.getItem('gemini_api_key_mml') || "";
+        let newKey = prompt("Gestión de API Key de Gemini\n\nClave actual (déjalo vacío para borrarla):\n", currentKey);
+        if (newKey !== null) {
+            if (newKey.trim() === "") {
+                localStorage.removeItem('gemini_api_key_mml');
+                alert("API Key borrada.");
+            } else {
+                localStorage.setItem('gemini_api_key_mml', newKey.trim());
+                alert("API Key guardada exitosamente.");
+            }
+        }
     }
     
     function abrirAnalistaIA() { 
-        if (obtenerApiKeysArray().length > 0) document.getElementById('iaModal').style.display = "flex"; 
+        // SIEMPRE abre el modal, sin importar si hay clave o no.
+        document.getElementById('iaModal').style.display = "flex"; 
+        
+        // Si no hay clave, muestra un mensaje amistoso en el chat invitando a ponerla.
+        const keys = obtenerApiKeysArray();
+        if(keys.length === 0 && document.getElementById('chat-history').innerHTML === "") {
+            appendMessage('ia', '¡Hola! Soy tu asistente IA. Para empezar a analizar las noticias, haz clic en el botón <b>"🔑 API Key"</b> aquí arriba para conectar tu cuenta de Google Gemini.');
+        }
     }
     
     function cerrarModal() { 
@@ -751,7 +738,6 @@
     
     function limpiarChat() { 
         document.getElementById('chat-history').innerHTML = ''; 
-        chatContext = [];
     }
     
     function handleEnter(e) { 
@@ -772,14 +758,25 @@
         inputObj.value = '';
         document.getElementById('btnSend').disabled = true;
         
+        const keys = obtenerApiKeysArray();
+        
+        // Control riguroso: si no hay key, bloquea la acción pero avisa en pantalla
+        if (keys.length === 0) {
+            appendMessage('ia', '⚠️ <b>Falta tu API Key.</b><br>Haz clic en el botón <b>"🔑 API Key"</b> en la parte superior para ingresarla y vuelve a enviarme tu pregunta.');
+            document.getElementById('btnSend').disabled = false;
+            return;
+        }
+
         const loadingId = 'loading-' + Date.now();
-        document.getElementById('chat-history').innerHTML += `<div id="${loadingId}" class="loading-ia"><div class="spinner"></div>Analizando los datos del Semáforo...</div>`;
+        document.getElementById('chat-history').innerHTML += `<div id="${loadingId}" class="loading-ia"><div class="spinner"></div>Analizando los datos...</div>`;
         scrollToBottom();
 
-        const dataContextStr = JSON.stringify(currentFilteredData.map(r => ({ Fecha: r.fecha, Titular: r.titular, Medio: r.medio, Tipo: r.tipoMedio, Tono: r.tono, Resumen: r.resumen })));
-        const promptFull = `Contexto de datos actuales (MML): ${dataContextStr}\n\nPregunta del usuario: ${text}\n\nResponde en formato HTML básico (puedes usar <b>, <ul>, <br>) sin bloques de código markdown. Sé conciso y analítico.`;
+        // Extraemos un MÁXIMO de 50 notas para evitar sobrecargar a la IA y que falle en silencio
+        const safeDataForAI = currentFilteredData.slice(0, 50).map(r => ({ Fecha: r.fecha, Titular: r.titular, Medio: r.medio, Tipo: r.tipoMedio, Tono: r.tono, Resumen: r.resumen }));
+        const dataContextStr = JSON.stringify(safeDataForAI);
+        
+        const promptFull = `Eres un experto analista político. Aquí tienes los datos filtrados actuales del Semáforo de Medios de la MML (máximo 50 notas para contexto):\n${dataContextStr}\n\nPregunta del usuario: ${text}\n\nResponde en formato HTML básico (usa <b>, <ul>, <li>, <br>). Sé directo, profesional y analítico. NO uses markdown tradicional (ni ** ni *).`;
 
-        const keys = obtenerApiKeysArray();
         let success = false;
         let responseText = "";
 
@@ -791,22 +788,24 @@
                     body: JSON.stringify({ contents: [{ parts: [{ text: promptFull }] }] })
                 });
                 const result = await response.json();
+                
                 if (result.candidates && result.candidates.length > 0) {
                     responseText = result.candidates[0].content.parts[0].text;
                     success = true;
                     break;
+                } else if (result.error) {
+                    console.error("Error devuelto por Gemini:", result.error.message);
                 }
-            } catch (e) { console.error("Fallo con una key:", e); }
+            } catch (e) { console.error("Fallo de conexión en Fetch:", e); }
         }
 
         document.getElementById(loadingId).remove();
         document.getElementById('btnSend').disabled = false;
 
         if (success) {
-            let htmlFormatted = responseText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-            appendMessage('ia', htmlFormatted);
+            appendMessage('ia', responseText);
         } else {
-            appendMessage('ia', '<b style="color:red;">Error de conexión.</b> Verifica tu API Key o revisa tu conexión a internet.');
+            appendMessage('ia', '<b style="color:#b91c1c;">Error de conexión con la IA.</b><br>Esto sucede si tu API Key es inválida, si no tienes internet, o si la cuota de Google se agotó. Revisa tu clave usando el botón "🔑 API Key".');
         }
     }
 
