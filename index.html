@@ -70,39 +70,24 @@
         .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; text-align: center; white-space: nowrap; }
         .btn-link:hover { background: #1d4ed8; }
 
-        /* Animación para el indicador de IA */
         @keyframes pulsoIA {
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(1.05); }
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Responsivo para móviles */
-        @media (max-width: 600px) {
-            .date-controls { flex-wrap: wrap; }
-            .date-controls input[type="date"] { width: 100%; flex: none; }
-        }
-        
         @media (max-width: 768px) {
             .header-left { gap: 10px; }
             .header-logo { height: 26px; padding: 4px 6px; }
             header h1 { font-size: 0.85rem !important; }
             .header-credits { font-size: 9px !important; }
-            
             .summary-cards { grid-template-columns: repeat(2, 1fr); }
             .actions-bar { justify-content: center; }
-            
             table, thead, tbody, th, td, tr { display: block; }
             thead tr { display: none; }
             .table-box { border: none; background: transparent; }
-            
-            tr { 
-                margin-bottom: 12px; border-radius: 10px; border: 1px solid #cbd5e1; 
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 0; 
-            }
+            tr { margin-bottom: 12px; border-radius: 10px; border: 1px solid #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 0; }
             td { padding: 0; border: none; text-align: left !important; }
-            td::before { display: none; } 
-            
             td:nth-child(1) { width: 50%; order: 1; font-size: 11px; color: #475569; }
             td:nth-child(3) { width: 50%; order: 2; text-align: right !important; }
             td:nth-child(2) { width: 100%; order: 3; }
@@ -137,7 +122,7 @@
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
             <span id="indicador-pulso-ia" style="display: inline-block; width: 10px; height: 10px; background-color: var(--accent); border-radius: 50%;"></span>
             <h2 style="font-size: 12px; font-weight: 800; color: #0f172a; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">
-                🤖 Analista Político Virtual (IA + Inteligencia de Coyuntura)
+                🤖 Analista Político Virtual (IA + Respaldo Lingüístico Local)
             </h2>
         </div>
         <div id="caja-analisis-ia" style="font-size: 13px; line-height: 1.6; color: #334155; font-weight: 500;">
@@ -237,16 +222,13 @@
     
     let currentMode = 'hoy'; 
     let mostrarAyer = true; 
-
     let controlTokenIA = 0;
 
     async function init() {
         try {
             const cacheBusterUrl = csv_url + '&t=' + new Date().getTime();
             const response = await fetch(cacheBusterUrl);
-            
             if (!response.ok) throw new Error("No se pudo conectar a Google Sheets.");
-  
             const csvText = await response.text();
             Papa.parse(csvText, {
                 header: true,
@@ -257,7 +239,6 @@
                 },
                 complete: function(results) {
                     const headers = Object.keys(results.data[0]);
-
                     const cMarcaTemporal = headers.find(h => h.includes('MARCA TEMPORAL')); 
                     const cFecha = headers.find(h => h.includes('FECHA DE PUBLICACION'));
                     const cTitular = headers.find(h => h.includes('TITULAR'));
@@ -301,7 +282,6 @@
     function generateStaticFilters(data) {
         const tonos = [...new Set(data.map(row => row.tono).filter(t => t !== ""))].sort();
         const tiposMedio = [...new Set(data.map(row => row.tipoMedio).filter(m => m !== ""))].sort();
-
         const selectTono = document.getElementById('filterTono');
         const selectTipoMedio = document.getElementById('filterTipoMedio');
         tonos.forEach(t => { selectTono.appendChild(new Option(t, t)); });
@@ -314,152 +294,38 @@
         const d = String(hoyDate.getDate()).padStart(2, '0');
         document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
         document.getElementById('filterHora').value = '';
-        currentMode = 'hoy';
-        mostrarAyer = false; 
-        runFilters();
+        currentMode = 'hoy'; mostrarAyer = false; runFilters();
     }
 
     function setAyerYHoy() {
         document.getElementById('filterFecha').value = '';
         document.getElementById('filterHora').value = '';
-        currentMode = 'rango_ayer_hoy';
-        mostrarAyer = false; 
-        runFilters();
+        currentMode = 'rango_ayer_hoy'; mostrarAyer = false; runFilters();
     }
 
-    function verMes() {
-        document.getElementById('filterFecha').value = '';
-        document.getElementById('filterHora').value = ''; 
-        currentMode = 'month';
-        mostrarAyer = false;
-        runFilters();
-    }
-
-    function onFechaChange() {
-        const val = document.getElementById('filterFecha').value;
-        const y = hoyDate.getFullYear();
-        const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
-        const d = String(hoyDate.getDate()).padStart(2, '0');
-        if (val === `${y}-${m}-${d}`) {
-            currentMode = 'hoy';
-            mostrarAyer = false; 
-        } else {
-            currentMode = val ? 'specific' : 'month'; 
-            mostrarAyer = false;
-        }
-        runFilters();
-    }
-
-    function toggleAyer() {
-        mostrarAyer = !mostrarAyer;
-        runFilters();
-    }
-
-    function resetFilters() {
-        const y = hoyDate.getFullYear();
-        const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
-        const d = String(hoyDate.getDate()).padStart(2, '0');
-
-        document.getElementById('search').value = '';
-        document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
-        document.getElementById('filterHora').value = '';
-        document.getElementById('filterEtiqueta').value = '';
-        document.getElementById('filterTono').value = '';
-        document.getElementById('filterTipoMedio').value = '';
-        
-        currentMode = 'hoy';
-        mostrarAyer = true; 
-        runFilters();
-    }
+    /* Manejadores de Estado Básicos */
+    function verMes() { document.getElementById('filterFecha').value = ''; document.getElementById('filterHora').value = ''; currentMode = 'month'; mostrarAyer = false; runFilters(); }
+    function onFechaChange() { const val = document.getElementById('filterFecha').value; const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0'); if (val === `${y}-${m}-${d}`) { currentMode = 'hoy'; mostrarAyer = false; } else { currentMode = val ? 'specific' : 'month'; mostrarAyer = false; } runFilters(); }
+    function toggleAyer() { mostrarAyer = !mostrarAyer; runFilters(); }
+    function resetFilters() { const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0'); document.getElementById('search').value = ''; document.getElementById('filterFecha').value = `${y}-${m}-${d}`; document.getElementById('filterHora').value = ''; document.getElementById('filterEtiqueta').value = ''; document.getElementById('filterTono').value = ''; document.getElementById('filterTipoMedio').value = ''; currentMode = 'hoy'; mostrarAyer = true; runFilters(); }
 
     function downloadExcel() {
         if (currentFilteredData.length === 0) return alert("No hay datos para descargar.");
-        const dataParaExcel = currentFilteredData.map(row => ({
-            'Fecha Registro': row.marcaTemporal, 
-            'Fecha Noticia': row.fecha,
-            'Titular': row.titular,
-            'Medio': row.medio,
-            'Tipo de Medio': row.tipoMedio,
-            'Tono': row.tono,
-            'Resumen': row.resumen,
-            'Etiqueta': row.etiqueta,
-            'Enlace': row.link
-        }));
-        const csvString = Papa.unparse(dataParaExcel);
+        const csvString = Papa.unparse(currentFilteredData.map(row => ({ 'Fecha Registro': row.marcaTemporal, 'Fecha Noticia': row.fecha, 'Titular': row.titular, 'Medio': row.medio, 'Tipo de Medio': row.tipoMedio, 'Tono': row.tono, 'Resumen': row.resumen, 'Etiqueta': row.etiqueta, 'Enlace': row.link })));
         const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", "Semaforo_MML_Reporte.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", "Semaforo_MML_Reporte.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
     function downloadPDF() {
         const elemento = document.getElementById('dashboard-content');
-        const btnAyer = document.getElementById('btn-ayer-container');
-        btnAyer.style.display = 'none'; 
-        
-        const opciones = {
-            margin:       0.3,
-            filename:     'Semaforo_MML_Reporte.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-        };
-        html2pdf().set(opciones).from(elemento).save().then(() => {
-            if(currentMode === 'hoy') btnAyer.style.display = 'block';
-        });
+        const btnAyer = document.getElementById('btn-ayer-container'); btnAyer.style.display = 'none'; 
+        html2pdf().set({ margin: 0.3, filename: 'Semaforo_MML_Reporte.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(elemento).save().then(() => { if(currentMode === 'hoy') btnAyer.style.display = 'block'; });
     }
 
-    function parseExcelDate(dateStr) {
-        if (!dateStr) return null;
-        const clean = dateStr.split(' ')[0].trim();
-        const p = clean.split('/');
-        if(p.length !== 3) return null;
-        const d = parseInt(p[0], 10);
-        const m = parseInt(p[1], 10) - 1;
-        let y = parseInt(p[2], 10);
-        if (y < 100) y += 2000;
-        return new Date(y, m, d).getTime();
-    }
-
-    function getMinutesFromMarcaTemporal(marcaTemporalStr) {
-        if (!marcaTemporalStr) return -1;
-        const parts = marcaTemporalStr.trim().split(/\s+/);
-        if (parts.length < 2) return -1;
-        
-        const timePart = parts[1]; 
-        const timeParts = timePart.split(':');
-        let h = parseInt(timeParts[0], 10);
-        let m = parseInt(timeParts[1], 10);
-        
-        if (isNaN(h)) return -1;
-        if (isNaN(m)) m = 0;
-        let offset = 0;
-        const fullStr = marcaTemporalStr.toLowerCase();
-        if (fullStr.includes('p.m.') || fullStr.includes('pm') || fullStr.includes('p. m.')) {
-            if (h < 12) offset = 12 * 60;
-        } else if (fullStr.includes('a.m.') || fullStr.includes('am') || fullStr.includes('a. m.')) {
-            if (h === 12) h = 0;
-        }
-        
-        return (h * 60) + m + offset;
-    }
-
-    function updateDynamicEtiquetas(dataParaEsaFecha, etiquetaActual) {
-        const selectEtiqueta = document.getElementById('filterEtiqueta');
-        const etiquetasDisponibles = [...new Set(dataParaEsaFecha.map(row => row.etiqueta).filter(e => e !== ""))].sort();
-        
-        selectEtiqueta.innerHTML = '<option value="">Todas las etiquetas</option>';
-        etiquetasDisponibles.forEach(e => { 
-            selectEtiqueta.appendChild(new Option(e, e)); 
-        });
-        if (etiquetasDisponibles.includes(etiquetaActual)) {
-            selectEtiqueta.value = etiquetaActual;
-        }
-    }
+    function parseExcelDate(dateStr) { if (!dateStr) return null; const clean = dateStr.split(' ')[0].trim(); const p = clean.split('/'); if(p.length !== 3) return null; let y = parseInt(p[2], 10); if (y < 100) y += 2000; return new Date(y, parseInt(p[1], 10) - 1, parseInt(p[0], 10)).getTime(); }
+    function getMinutesFromMarcaTemporal(marcaTemporalStr) { if (!marcaTemporalStr) return -1; const parts = marcaTemporalStr.trim().split(/\s+/); if (parts.length < 2) return -1; const timeParts = parts[1].split(':'); let h = parseInt(timeParts[0], 10), m = parseInt(timeParts[1], 10); if (isNaN(h)) return -1; if (isNaN(m)) m = 0; let offset = 0; const fullStr = marcaTemporalStr.toLowerCase(); if (fullStr.includes('p.m.') || fullStr.includes('pm') || fullStr.includes('p. m.')) { if (h < 12) offset = 12 * 60; } else if (fullStr.includes('a.m.') || fullStr.includes('am') || fullStr.includes('a. m.')) { if (h === 12) h = 0; } return (h * 60) + m + offset; }
+    function updateDynamicEtiquetas(dataParaEsaFecha, etiquetaActual) { const selectEtiqueta = document.getElementById('filterEtiqueta'); const etiquetasDisponibles = [...new Set(dataParaEsaFecha.map(row => row.etiqueta).filter(e => e !== ""))].sort(); selectEtiqueta.innerHTML = '<option value="">Todas las etiquetas</option>'; etiquetasDisponibles.forEach(e => { selectEtiqueta.appendChild(new Option(e, e)); }); if (etiquetasDisponibles.includes(etiquetaActual)) selectEtiqueta.value = etiquetaActual; }
 
     function runFilters() {
         const search = document.getElementById('search').value.toLowerCase();
@@ -468,48 +334,18 @@
         const fechaInput = document.getElementById('filterFecha').value; 
         const horaInput = document.getElementById('filterHora').value; 
         const etiquetaPrevia = document.getElementById('filterEtiqueta').value;
-        let minMinutes = -1;
-        if (horaInput) {
-            const [hInput, mInput] = horaInput.split(':');
-            minMinutes = parseInt(hInput, 10) * 60 + parseInt(mInput, 10);
-        }
+        let minMinutes = -1; if (horaInput) { const [hInput, mInput] = horaInput.split(':'); minMinutes = parseInt(hInput, 10) * 60 + parseInt(mInput, 10); }
 
         const btnAyerContainer = document.getElementById('btn-ayer-container');
         const btnAyer = document.getElementById('btn-ayer');
-        if (currentMode === 'hoy') {
-            btnAyerContainer.style.display = 'block';
-            btnAyer.innerHTML = mostrarAyer ? "➖ Ocultar notas de ayer (registradas hoy)" : "➕ Incluir notas de ayer (registradas hoy)";
-        } else {
-            btnAyerContainer.style.display = 'none';
-        }
+        if (currentMode === 'hoy') { btnAyerContainer.style.display = 'block'; btnAyer.innerHTML = mostrarAyer ? "➖ Ocultar notas de ayer (registradas hoy)" : "➕ Incluir notas de ayer (registradas hoy)"; } else { btnAyerContainer.style.display = 'none'; }
 
         const dateFiltered = allData.filter(row => {
-            const rowTime = parseExcelDate(row.fecha); 
-            if (!rowTime) return true;
-
-            const rowDateObj = new Date(rowTime);
-            const rY = rowDateObj.getFullYear();
-            const rM = rowDateObj.getMonth();
-
-            if (currentMode === 'hoy') {
-                if (rowTime === hoyTime) return true; 
-                if (mostrarAyer && rowTime === ayerTime) {
-                    const rowRegistroTime = parseExcelDate(row.marcaTemporal); 
-                    if (rowRegistroTime === hoyTime) return true; 
-                }
-                return false;
-            } 
-            else if (currentMode === 'rango_ayer_hoy') {
-                return (rowTime === ayerTime || rowTime === hoyTime);
-            }
-            else if (currentMode === 'specific' && fechaInput) {
-                const [yInput, mInput, dInput] = fechaInput.split('-');
-                const targetTime = new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime();
-                return (rowTime === targetTime);
-            } 
-            else if (currentMode === 'month') {
-                return (rY === hoyDate.getFullYear() && rM === hoyDate.getMonth());
-            }
+            const rowTime = parseExcelDate(row.fecha); if (!rowTime) return true;
+            if (currentMode === 'hoy') { if (rowTime === hoyTime) return true; if (mostrarAyer && rowTime === ayerTime) { if (parseExcelDate(row.marcaTemporal) === hoyTime) return true; } return false; } 
+            else if (currentMode === 'rango_ayer_hoy') return (rowTime === ayerTime || rowTime === hoyTime);
+            else if (currentMode === 'specific' && fechaInput) { const [yInput, mInput, dInput] = fechaInput.split('-'); return (rowTime === new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime()); } 
+            else if (currentMode === 'month') return (new Date(rowTime).getFullYear() === hoyDate.getFullYear() && new Date(rowTime).getMonth() === hoyDate.getMonth());
             return true; 
         });
 
@@ -522,41 +358,19 @@
             const matchTono = tono === "" || row.tono === tono;
             const matchTipoMedio = tipoMedio === "" || row.tipoMedio === tipoMedio;
             const matchEtiqueta = etiquetaActual === "" || row.etiqueta === etiquetaActual;
-            
             let matchHora = true;
             if (minMinutes >= 0) {
                 const rowMins = getMinutesFromMarcaTemporal(row.marcaTemporal);
-                if (currentMode === 'rango_ayer_hoy') {
-                    const rowFechaVal = parseExcelDate(row.fecha);
-                    if (rowFechaVal === ayerTime) {
-                        const marcaFechaVal = parseExcelDate(row.marcaTemporal);
-                        if (marcaFechaVal === hoyTime) {
-                            matchHora = true;
-                        } else {
-                            if (rowMins !== -1 && rowMins < minMinutes) {
-                                matchHora = false;
-                            }
-                        }
-                    }
-                } else {
-                    if (rowMins !== -1 && rowMins < minMinutes) {
-                        matchHora = false;
-                    }
-                }
+                if (currentMode === 'rango_ayer_hoy' && parseExcelDate(row.fecha) === ayerTime && parseExcelDate(row.marcaTemporal) !== hoyTime) {
+                    if (rowMins !== -1 && rowMins < minMinutes) matchHora = false;
+                } else if (currentMode !== 'rango_ayer_hoy' && rowMins !== -1 && rowMins < minMinutes) matchHora = false;
             }
-
             return matchSearch && matchTono && matchTipoMedio && matchEtiqueta && matchHora;
         });
         
         currentFilteredData = finalFiltered;
-
         let countPos = 0, countNeu = 0, countNeg = 0;
-        finalFiltered.forEach(row => {
-            const tLow = row.tono.toLowerCase();
-            if (tLow.includes('pos')) countPos++;
-            else if (tLow.includes('neg')) countNeg++;
-            else countNeu++;
-        });
+        finalFiltered.forEach(row => { const tLow = row.tono.toLowerCase(); if (tLow.includes('pos')) countPos++; else if (tLow.includes('neg')) countNeg++; else countNeu++; });
         document.getElementById('count-total').innerText = finalFiltered.length;
         document.getElementById('count-pos').innerText = countPos;
         document.getElementById('count-neu').innerText = countNeu;
@@ -568,28 +382,12 @@
 
     function renderTable(data, horaInput) {
         const tbody = document.getElementById('table-body');
-        const countBox = document.getElementById('data-count');
-        tbody.innerHTML = '';
-        
+        const countBox = document.getElementById('data-count'); tbody.innerHTML = '';
         const displayData = data.slice(0, 300);
-        let textoConteo = currentMode === 'hoy' ?
-                          (mostrarAyer ? "Mostrando: Hoy + Rezagos de ayer" : "Mostrando: Solo Hoy") : 
-                          currentMode === 'rango_ayer_hoy' ?
-                          "Mostrando: Ayer y Hoy" :
-                          currentMode === 'specific' ?
-                          "Mostrando Fecha Seleccionada" : 
-                          currentMode === 'month' ?
-                          "Mostrando: Este Mes" : "Mostrando Datos";
+        let textoConteo = currentMode === 'hoy' ? (mostrarAyer ? "Mostrando: Hoy + Rezagos de ayer" : "Mostrando: Solo Hoy") : currentMode === 'rango_ayer_hoy' ? "Mostrando: Ayer y Hoy" : currentMode === 'specific' ? "Mostrando Fecha Seleccionada" : "Mostrando: Este Mes";
+        if (horaInput) textoConteo += currentMode === 'rango_ayer_hoy' ? ` (Ayer desde las ${horaInput} y todo hoy)` : ` (Desde las ${horaInput})`;
         
-        if (horaInput) {
-            if (currentMode === 'rango_ayer_hoy') {
-                textoConteo += ` (Ayer desde las ${horaInput} y todo hoy)`;
-            } else {
-                textoConteo += ` (Desde las ${horaInput})`;
-            }
-        }
-        
-        countBox.innerText = `${textoConteo}`;
+        countBox.innerText = textoConteo;
         if (displayData.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b; border:none;">No hay noticias para mostrar con estos filtros.<br><br><button onclick="verMes()" class="btn-action bg-gray" style="padding:10px 15px;">Ver todo el mes</button></td></tr>`;
             return;
@@ -597,153 +395,139 @@
 
         displayData.forEach(row => {
             const tLow = row.tono.toLowerCase();
-            let badgeClass = 'badge-neutro';
-            let rowStyle = '';
-
-            if (tLow.includes('pos')) {
-                badgeClass = 'badge-positivo';
-                rowStyle = 'background-color: #86efac;'; 
-            } else if (tLow.includes('neg')) {
-                badgeClass = 'badge-negativo';
-                rowStyle = 'background-color: #fc8181;'; 
-            } else {
-                badgeClass = 'badge-neutro';
-                rowStyle = 'background-color: #fde047;'; 
-            }
+            let badgeClass = 'badge-neutro', rowStyle = 'background-color: #fde047;';
+            if (tLow.includes('pos')) { badgeClass = 'badge-positivo'; rowStyle = 'background-color: #86efac;'; }
+            else if (tLow.includes('neg')) { badgeClass = 'badge-negativo'; rowStyle = 'background-color: #fc8181;'; }
             
-            const linkHTML = row.link.includes('http') ? 
-                `<a href="${row.link}" target="_blank" class="btn-link">Abrir Nota</a>` : 
-                `<span style="color:#64748b; font-size:11px; display:block; text-align:center; padding:6px 0;">Sin Enlace</span>`;
+            const linkHTML = row.link.includes('http') ? `<a href="${row.link}" target="_blank" class="btn-link">Abrir Nota</a>` : `<span style="color:#64748b; font-size:11px; display:block; text-align:center; padding:6px 0;">Sin Enlace</span>`;
+            let horaRegistro = ""; if(row.marcaTemporal) { const parts = row.marcaTemporal.trim().split(/\s+/); if(parts.length >= 2) horaRegistro = `<div style="font-size:10px; color:rgba(0,0,0,0.65); font-weight:600; margin-top:4px;">Registrado: ${parts[1]}</div>`; }
 
-            let horaRegistro = "";
-            if(row.marcaTemporal) {
-                const parts = row.marcaTemporal.trim().split(/\s+/);
-                if(parts.length >= 2) horaRegistro = `<div style="font-size:10px; color:rgba(0,0,0,0.65); font-weight:600; margin-top:4px;">Registrado: ${parts[1]}</div>`;
-            }
-
-            tbody.innerHTML += `
-                <tr style="${rowStyle}">
-                    <td data-label="Fecha">
-                        <div style="font-weight:700;">${row.fecha}</div>
-                        ${horaRegistro}
-                    </td>
-                    <td data-label="Noticia">
-                        <div style="font-weight:800; margin-bottom:5px; font-size:13px;">${row.titular}</div>
-                        <div style="font-size:10px; color:var(--primary); font-weight:800; text-transform:uppercase;">${row.medio} <span style="color:#64748b;">(${row.tipoMedio})</span></div>
-                    </td>
-                    <td data-label="Tono"><span class="badge ${badgeClass}">${row.tono}</span></td>
-                    <td data-label="Resumen" style="font-weight:600;">${row.resumen}</td>
-                    <td data-label="Enlace" style="text-align:center;">${linkHTML}</td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr style="${rowStyle}"><td data-label="Fecha"><div style="font-weight:700;">${row.fecha}</div>${horaRegistro}</td><td data-label="Noticia"><div style="font-weight:800; margin-bottom:5px; font-size:13px;">${row.titular}</div><div style="font-size:10px; color:var(--primary); font-weight:800; text-transform:uppercase;">${row.medio} <span style="color:#64748b;">(${row.tipoMedio})</span></div></td><td data-label="Tono"><span class="badge ${badgeClass}">${row.tono}</span></td><td data-label="Resumen" style="font-weight:600;">${row.resumen}</td><td data-label="Enlace" style="text-align:center;">${linkHTML}</td></tr>`;
         });
     }
 
-    // 🤖 LÓGICA DE PRODUCCIÓN CANAL ESTABLE CON RED DE SEGURIDAD INTERNA
+    // 🤖 SISTEMA HÍBRIDO BLINDADO: SOLICITUD DIRECTA + MOTOR LINGÜÍSTICO LOCAL DE RESPALDO IMEDIATO
     async function ejecutarAnalisisIAConFiltros(noticiasFiltradas) {
         controlTokenIA++;
         const tokenActual = controlTokenIA;
-
         const cajaIA = document.getElementById('caja-analisis-ia');
         const pulso = document.getElementById('indicador-pulso-ia');
 
         if (!noticiasFiltradas || noticiasFiltradas.length === 0) {
             cajaIA.innerHTML = `<span style="color: #64748b; font-style: italic;">No hay registros disponibles en el rango o filtro seleccionado para realizar un diagnóstico de coyuntura.</span>`;
-            pulso.style.animation = 'none';
-            return;
+            pulso.style.animation = 'none'; return;
         }
 
         pulso.style.animation = 'pulsoIA 1s infinite';
-        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Analizando menciones en canal estable de producción... Evaluando tendencias de coyuntura...</span>`;
+        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Evaluando agenda de medios en tiempo real...</span>`;
 
-        const sPart1 = "AIzaSyC3SyvPVlkPo8";
-        const sPart2 = "CLI76vdgCnDFkbTbJ03-4";
+        // Mecanismo de aborto/tiempo de espera por si la red corporativa congela la petición (6 segundos máximo)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const sPart1 = "AIzaSyC3SyvPVlkPo8"; const sPart2 = "CLI76vdgCnDFkbTbJ03-4";
         const apiKey = sPart1 + sPart2;
 
-        const resumenCoyuntura = noticiasFiltradas.slice(0, 45).map((n, idx) => {
-            return `[${idx+1}] (${n.tono}) Medio: ${n.medio} | Titulo: ${n.titular} | Resumen: ${n.resumen}`;
-        }).join("\n");
+        const resumenCoyuntura = noticiasFiltradas.slice(0, 40).map((n, idx) => `[${idx+1}] (${n.tono}) Medio: ${n.medio} | Titulo: ${n.titular} | Resumen: ${n.resumen}`).join("\n");
+        const prompt = `Actúa como un Analista Político Experto de la Municipalidad de Lima. Analiza y genera un informe resumido estructurado exactamente así:\n1. **DIAGNÓSTICO EXPRESS**: Un párrafo corto de máximo 3 líneas.\n2. **ALERTAS CRÍTICAS / FOCOS DE CONFLICTO**: Dos viñetas rápidas sobre crisis o notas negativas.\n3. **OPORTUNIDADES / APUNTES ESTRATÉGICOS**: Dos viñetas breves sobre avances positivos.\n\nDatos:\n${resumenCoyuntura}`;
 
-        const prompt = `Actúa como un Analista Político Experto especializado en la gestión pública de la Municipalidad Metropolitana de Lima (MML). Analiza el siguiente set de noticias extraídas del semáforo de medios institucional y genera un informe de coyuntura sumamente sintético y ejecutivo estructurado exactamente así:
-        
-        1. **DIAGNÓSTICO EXPRESS**: Un párrafo corto de máximo 3 líneas resumiendo el balance de la agenda del día o periodo seleccionado, identificando los temas centrales dominantes.
-        2. **ALERTAS CRÍTICAS / FOCOS DE CONFLICTO**: Dos viñetas rápidas sobre las crisis, críticas o notas negativas con mayor potencial de daño reputacional para la municipalidad o el alcalde. Si no las hay, indícalo con un tono positivo.
-        3. **OPORTUNIDADES / APUNTES ESTRATÉGICOS**: Dos viñetas breves que resalten hitos, avances positivos o temas neutros/positivos que la MML debería amplificar y capitalizar comunicacionalmente.
-
-        Sé directo, analítico, profesional y muy ejecutivo. Evita rodeos técnicos o introducciones innecesarias.
-        
-        Aquí están los datos vigentes para el análisis de coyuntura:\n${resumenCoyuntura}`;
-
-        // Pasamos al canal de producción v1 oficial que acepta políticas restrictivas corporativas de Google
-        const modelosEnCascada = [
-            "models/gemini-1.5-flash",
-            "models/gemini-pro",
-            "models/gemini-1.5-pro"
-        ];
-
+        const modelosEnCascada = ["models/gemini-1.5-flash", "models/gemini-pro"];
         let exito = false;
 
         for (let i = 0; i < modelosEnCascada.length; i++) {
-            if (tokenActual !== controlTokenIA) return;
-
-            const modeloIntento = modelosEnCascada[i];
+            if (tokenActual !== controlTokenIA) { clearTimeout(timeoutId); return; }
             try {
-                // Endpoint v1 limpia (No v1beta que causa bloqueos por políticas en cuentas de gobierno/instituciones)
-                const endpoint = `https://generativelanguage.googleapis.com/v1/${modeloIntento}:generateContent?key=${apiKey}`;
-                
+                const endpoint = `https://generativelanguage.googleapis.com/v1/${modelosEnCascada[i]}:generateContent?key=${apiKey}`;
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+                    signal: controller.signal
                 });
 
-                if (!response.ok) throw new Error("Siguiente");
-
-                const jsonResponse = await response.json();
-                
-                if (jsonResponse.candidates && jsonResponse.candidates[0].content.parts[0].text) {
-                    const textoCrudoIA = jsonResponse.candidates[0].content.parts[0].text;
-                    
-                    if (tokenActual === controlTokenIA) {
-                        cajaIA.innerHTML = procesarMarkdownAI(textoCrudoIA);
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    if (jsonResponse.candidates && jsonResponse.candidates[0].content.parts[0].text) {
+                        const textoCrudoIA = jsonResponse.candidates[0].content.parts[0].text;
+                        if (tokenActual === controlTokenIA) {
+                            cajaIA.innerHTML = procesarMarkdownAI(textoCrudoIA);
+                        }
+                        exito = true; clearTimeout(timeoutId); break;
                     }
-                    exito = true;
-                    break; 
                 }
             } catch (err) {
-                // Silencioso, salta al siguiente modelo estable de producción
+                // Salto silencioso al plan B o motor local
             }
         }
 
-        // RED DE SEGURIDAD ABSOLUTA: Si Google bloquea todo por proxies o firewalls locales de tu red corporativa
+        // 🧠 RESPALDO AUTOMÁTICO LOCAL (Entra en acción instantáneamente si Google es bloqueado por la red)
         if (!exito && tokenActual === controlTokenIA) {
-            cajaIA.innerHTML = `
-                <div style="background: #fff5f5; border: 1px solid #fed7d7; padding: 12px; border-radius: 8px;">
-                    <span style="color: #c53030; font-weight: 700; display: block; margin-bottom: 5px;">⚠️ El servicio de Google está demorando en responder (Filtros cargados con éxito)</span>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: #4a5568;">Las menciones de la tabla y los gráficos inferiores ya están filtrados y listos. Si deseas forzar un nuevo intento de diagnóstico automático sin recargar toda la página, usa el botón de abajo:</p>
-                    <button class="btn-action bg-purple" style="min-height: 30px; height: 32px; font-size: 11px; padding: 0 15px; border-radius: 6px;" onclick="forzarReintentoIA()">🔄 Volver a solicitar análisis virtual</button>
-                </div>`;
+            clearTimeout(timeoutId);
+            ejecutarMotorCoyunturaLocal(noticiasFiltradas, cajaIA);
         }
 
-        if (tokenActual === controlTokenIA) {
-            pulso.style.animation = 'none';
-        }
+        if (tokenActual === controlTokenIA) pulso.style.animation = 'none';
     }
 
-    function forzarReintentoIA() {
-        if(currentFilteredData && currentFilteredData.length > 0) {
-            ejecutarAnalisisIAConFiltros(currentFilteredData);
+    // Algoritmo analítico sin servidor: Redacta un informe real basado en métricas y palabras clave
+    function ejecutarMotorCoyunturaLocal(noticias, contenedor) {
+        let pos = 0, neg = 0, neu = 0;
+        let temasCríticos = [];
+        let hitosPositivos = [];
+
+        noticias.forEach(n => {
+            const t = n.tono.toLowerCase();
+            const txt = (n.titular + " " + n.resumen).toLowerCase();
+            if (t.includes('pos')) {
+                pos++;
+                if (hitosPositivos.length < 2 && n.titular) hitosPositivos.push(n.titular);
+            } else if (t.includes('neg')) {
+                neg++;
+                if (temasCríticos.length < 2 && n.titular) temasCríticos.push(n.titular);
+            } else {
+                neu++;
+            }
+        });
+
+        // Balance de la agenda del día
+        let diagnostico = "";
+        if (neg > pos && neg > 0) {
+            diagnostico = `La agenda de medios se encuentra **altamente tensionada**, con un predominio de menciones negativas (${neg}). Los flujos de opinión pública están concentrados en cuestionamientos y demandas críticas que exigen respuestas tácticas inmediatas del equipo de vocería.`;
+        } else if (pos >= neg && pos > 0) {
+            diagnostico = `Coyuntura con un **balance favorable y controlado**. Las menciones positivas (${pos}) y neutras logran mitigar el impacto adverso de la crítica, permitiendo posicionar hitos de gestión y avances institucionales en la agenda pública.`;
+        } else {
+            diagnostico = `Predominio de **agenda neutra y técnica** (${neu} menciones). El escenario actual muestra un flujo mediático de carácter netamente informativo y de baja volatilidad política, idóneo para introducir notas de prensa institucionales programadas.`;
         }
+
+        // Construcción de viñetas adaptativas basadas en la data real
+        let alertasHTML = "";
+        if (temasCríticos.length > 0) {
+            alertasHTML = temasCríticos.map(t => `<li style="margin-left:15px; margin-bottom:4px;">**Foco Crítico:** "${t.slice(0, 95)}..." requiere monitoreo continuo para evitar escalada reputacional.</li>`).join("");
+        } else {
+            alertasHTML = `<li style="margin-left:15px; margin-bottom:4px;">No se registran alertas de alto impacto reputacional críticas en el bloque seleccionado. Escenario bajo control.</li>`;
+        }
+
+        let oportunidadesHTML = "";
+        if (hitosPositivos.length > 0) {
+            oportunidadesHTML = hitosPositivos.map(t => `<li style="margin-left:15px; margin-bottom:4px;">**Capitalizar Vocería:** Potenciar los alcances de la nota sobre "${t.slice(0, 95)}..." en canales digitales oficiales.</li>`).join("");
+        } else {
+            oportunidadesHTML = `<li style="margin-left:15px; margin-bottom:4px;">Aprovechar el volumen de notas informativas/neutras para insertar mensajes clave sobre obras en distritos periféricos.</li>`;
+        }
+
+        let htmlFinal = `
+            <div style="background: #fafafa; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size:11px; color:#475569; font-weight:700;">⚡ Diagnóstico Automático Local Activo (Independiente de servidores externos)</div>
+            <p><strong style="color:#0f172a; font-weight:700;">1. DIAGNÓSTICO EXPRESS:</strong><br>${diagnostico}</p>
+            <p><strong style="color:#0f172a; font-weight:700;">2. ALERTAS CRÍTICAS / FOCOS DE CONFLICTO:</strong><br>${alertasHTML}</p>
+            <p><strong style="color:#0f172a; font-weight:700;">3. OPORTUNIDADES / APUNTES ESTRATÉGICOS:</strong><br>${oportunidadesHTML}</p>
+        `;
+
+        contenedor.innerHTML = procesarMarkdownAI(htmlFinal);
     }
 
     function procesarMarkdownAI(texto) {
         let html = texto
-            .replace(/\*\*(.*?)\*\"/g, '<strong style="color:#0f172a; font-weight:700;">$1</strong>')
             .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a; font-weight:700;">$1</strong>')
-            .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li style="margin-left:15px; margin-bottom:4px;">$1</li>')
             .replace(/\n/g, '<br>');
-        
-        html = html.replace(/(<\/li><br>)/g, '</li>');
         return html;
     }
 
