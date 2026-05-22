@@ -234,7 +234,7 @@
 <div id="iaModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <div class="modal-title">🤖 Analista Político IA</div>
+            <div class="modal-title">🤖 Analista Político IA <span style="font-size: 12px; color: #10b981; margin-left: 10px; font-weight: bold;">(Ahorro Activo)</span></div>
             <div class="modal-actions">
                 <button class="btn-icon" onclick="limpiarChat()" title="Borrar historial para ahorrar límite de datos">🧹 Limpiar Memoria</button>
                 <button class="btn-icon" onclick="borrarApiKey()">🔑 API Key</button>
@@ -499,16 +499,19 @@
     function borrarApiKey() { localStorage.removeItem('gemini_api_key_mml'); alert("API Key eliminada."); cerrarModal(); }
 
     function construirPromptInicial() {
-        // OPTIMIZACIÓN: Solo tomamos las primeras 60 notas para no saturar los tokens
-        const dataOptimizada = currentFilteredData.slice(0, 60);
-        let textoNoticias = `BASE DE DATOS ACTUAL A ANALIZAR (Muestra de ${dataOptimizada.length} notas relevantes):\n\n`;
+        const dataOptimizada = currentFilteredData.slice(0, 30);
+        let textoNoticias = "DATOS:\n";
         
-        dataOptimizada.forEach((row, index) => {
-            // Solo pasamos Titular, Medio, Tono y Resumen (ahorramos links y fechas)
-            textoNoticias += `N${index + 1}: [${row.tono}] ${row.medio} | ${row.titular} - ${row.resumen}\n`;
+        dataOptimizada.forEach((row, i) => {
+            let resumenCorto = row.resumen.length > 150 ? row.resumen.substring(0, 150) + "..." : row.resumen;
+            textoNoticias += `${i+1}. [${row.tono}] ${row.medio}: ${row.titular} | ${resumenCorto}\n`;
         });
 
-        promptInicialIA = `Eres un Consultor Senior de Estrategia Política de la Municipalidad de Lima. Basa tus respuestas ÚNICAMENTE en este contexto:\n\n${textoNoticias}\n\nREGLA: Respuestas directas, profesionales y en Markdown limpio.`;
+        promptInicialIA = `${textoNoticias}\n\nREGLAS ESTRICTAS DE AHORRO DE TOKENS:
+1. Omite cualquier saludo, introducción o despedida.
+2. Escribe en formato telegrama o viñetas cortas (máximo 1 línea por viñeta).
+3. LÍMITE ABSOLUTO: Tu respuesta no puede superar las 100 palabras.
+4. Ve directo al dato, conclusión o acción. No parafrasees mi pregunta.`;
     }
 
     function abrirAnalistaIA() {
@@ -520,27 +523,33 @@
 
         if (currentFilteredData.length === 0) {
             document.getElementById('chat-history').innerHTML = '';
-            agregarBurbuja("No hay noticias cargadas en la tabla con los filtros actuales.", "ia");
+            agregarBurbuja("No hay noticias cargadas en la tabla.", "ia");
             return;
         }
 
-        // Si es la primera vez que se abre con este filtro, genera el reporte automático
         construirPromptInicial();
-        limpiarChat(false); // Limpia pero arranca con el reporte general
+        
+        const chatHistory = document.getElementById('chat-history');
+        if (chatHistory.innerHTML.trim() === '') {
+            limpiarChat(true); 
+        }
     }
 
-    function limpiarChat(mostrarMensajeVacio = true) {
+    function limpiarChat(esInicio = false) {
         document.getElementById('chat-history').innerHTML = '';
-        chatContext = [{ role: "user", parts: [{ text: promptInicialIA }] }];
         
-        if (mostrarMensajeVacio) {
-            agregarBurbuja("Memoria borrada. ✨ He olvidado la conversación anterior para ahorrar datos. ¿Qué deseas analizar ahora?", "ia");
-        } else {
-            // Reporte Inicial por defecto
-            chatContext.push({ role: "user", parts: [{ text: "Haz un Reporte Ejecutivo Inicial con estas 4 secciones: 1. BALANCE REPUTACIONAL, 2. ALERTAS Y CRISIS, 3. TEMAS CLAVE, 4. RECOMENDACIONES." }] });
-            agregarSpinner();
-            procesarConIA(chatContext);
-        }
+        // Carga interna, 0 conexión a internet, 0 tokens gastados
+        chatContext = [
+            { role: "user", parts: [{ text: promptInicialIA }] },
+            { role: "model", parts: [{ text: "Comprendido. Aplicaré el ahorro de tokens y seré ultra breve." }] }
+        ];
+        
+        // Saludo local escrito directamente en la pantalla
+        const mensaje = esInicio === true 
+            ? "👋 ¡Hola! Datos cargados en memoria. Selecciona un botón rápido o escribe tu consulta directa." 
+            : "🧹 Memoria limpia. Base de datos recargada. ¿Qué analizamos ahora?";
+            
+        agregarBurbuja(mensaje, "ia");
     }
 
     function cerrarModal() { document.getElementById('iaModal').style.display = "none"; }
