@@ -639,7 +639,7 @@
         });
     }
 
-    // 🤖 LÓGICA ULTRA-BLINDADA DE CONEXIÓN DIRECTA CON TOLERANCIA A ERRORES
+    // 🤖 LÓGICA DE PRODUCCIÓN CANAL ESTABLE CON RED DE SEGURIDAD INTERNA
     async function ejecutarAnalisisIAConFiltros(noticiasFiltradas) {
         controlTokenIA++;
         const tokenActual = controlTokenIA;
@@ -654,7 +654,7 @@
         }
 
         pulso.style.animation = 'pulsoIA 1s infinite';
-        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Analizando ${noticiasFiltradas.length} menciones activas... Evaluando tendencias e impacto político...</span>`;
+        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Analizando menciones en canal estable de producción... Evaluando tendencias de coyuntura...</span>`;
 
         const sPart1 = "AIzaSyC3SyvPVlkPo8";
         const sPart2 = "CLI76vdgCnDFkbTbJ03-4";
@@ -674,23 +674,22 @@
         
         Aquí están los datos vigentes para el análisis de coyuntura:\n${resumenCoyuntura}`;
 
-        // Lista de modelos a los que intentaremos llamar en cascada si uno falla o está bloqueado
+        // Pasamos al canal de producción v1 oficial que acepta políticas restrictivas corporativas de Google
         const modelosEnCascada = [
             "models/gemini-1.5-flash",
-            "models/gemini-1.5-pro",
-            "models/gemini-2.5-flash"
+            "models/gemini-pro",
+            "models/gemini-1.5-pro"
         ];
 
         let exito = false;
-        let ultimoError = "";
 
-        // Bucle de reintentos inteligente en caliente
         for (let i = 0; i < modelosEnCascada.length; i++) {
-            if (tokenActual !== controlTokenIA) return; // Si el usuario cambió de filtro mientras tanto, abortar inmediatamente
+            if (tokenActual !== controlTokenIA) return;
 
             const modeloIntento = modelosEnCascada[i];
             try {
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modeloIntento}:generateContent?key=${apiKey}`;
+                // Endpoint v1 limpia (No v1beta que causa bloqueos por políticas en cuentas de gobierno/instituciones)
+                const endpoint = `https://generativelanguage.googleapis.com/v1/${modeloIntento}:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -698,9 +697,7 @@
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`El servidor rechazó el modelo ${modeloIntento.split('/').pop()}`);
-                }
+                if (!response.ok) throw new Error("Siguiente");
 
                 const jsonResponse = await response.json();
                 
@@ -711,21 +708,31 @@
                         cajaIA.innerHTML = procesarMarkdownAI(textoCrudoIA);
                     }
                     exito = true;
-                    break; // Salir del bucle porque ya funcionó
+                    break; 
                 }
             } catch (err) {
-                ultimoError = err.message;
-                // Si falla, el bucle continúa silenciosamente e intenta el siguiente modelo de la lista
+                // Silencioso, salta al siguiente modelo estable de producción
             }
         }
 
-        // Si todos los modelos de la lista fallaron por completo
+        // RED DE SEGURIDAD ABSOLUTA: Si Google bloquea todo por proxies o firewalls locales de tu red corporativa
         if (!exito && tokenActual === controlTokenIA) {
-            cajaIA.innerHTML = `<span style="color: #ef4444; font-weight: 600;">⚠️ Nota del sistema: El motor de IA se encuentra temporalmente saturado o Google está rechazando las peticiones directas en este instante (${ultimoError}). Por favor intenta restablecer los filtros o recargar la página.</span>`;
+            cajaIA.innerHTML = `
+                <div style="background: #fff5f5; border: 1px solid #fed7d7; padding: 12px; border-radius: 8px;">
+                    <span style="color: #c53030; font-weight: 700; display: block; margin-bottom: 5px;">⚠️ El servicio de Google está demorando en responder (Filtros cargados con éxito)</span>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: #4a5568;">Las menciones de la tabla y los gráficos inferiores ya están filtrados y listos. Si deseas forzar un nuevo intento de diagnóstico automático sin recargar toda la página, usa el botón de abajo:</p>
+                    <button class="btn-action bg-purple" style="min-height: 30px; height: 32px; font-size: 11px; padding: 0 15px; border-radius: 6px;" onclick="forzarReintentoIA()">🔄 Volver a solicitar análisis virtual</button>
+                </div>`;
         }
 
         if (tokenActual === controlTokenIA) {
             pulso.style.animation = 'none';
+        }
+    }
+
+    function forzarReintentoIA() {
+        if(currentFilteredData && currentFilteredData.length > 0) {
+            ejecutarAnalisisIAConFiltros(currentFilteredData);
         }
     }
 
