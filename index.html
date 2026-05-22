@@ -57,7 +57,7 @@
         .bg-gray { background: #64748b; }
         .bg-purple { background: #8b5cf6; }
 
-        /* Estilos de Tabla Desktop */
+        /* Estilos de Tabla */
         .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; min-width: 100%; table-layout: fixed; word-wrap: break-word; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 11px; color: #64748b; border-bottom: 1px solid #eee; text-transform: uppercase; }
@@ -71,24 +71,29 @@
         .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; text-align: center; white-space: nowrap; }
         .btn-link:hover { background: #1d4ed8; }
 
-        /* Ventana Modal para el Analista IA con Chat */
+        /* Ventana Modal IA */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
-        .modal-content { background-color: #ffffff; padding: 25px; border-radius: 16px; width: 90%; max-width: 800px; height: 90vh; max-height: 800px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease; }
+        .modal-content { background-color: #ffffff; padding: 25px; border-radius: 16px; width: 95%; max-width: 900px; height: 90vh; max-height: 850px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 15px; flex-shrink: 0; }
         .modal-title { font-size: 1.2rem; font-weight: 800; color: #002f80; display: flex; align-items: center; gap: 8px; }
         .modal-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-reset-key { background: #cbd5e1; color: #334155; border: none; padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
-        .btn-reset-key:hover { background: #94a3b8; color: white; }
+        .btn-icon { background: #cbd5e1; color: #334155; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-icon:hover { background: #94a3b8; color: white; }
         .close-modal { font-size: 24px; font-weight: bold; color: #64748b; cursor: pointer; transition: color 0.2s; }
         .close-modal:hover { color: #1e293b; }
         
-        #chat-history { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; }
+        #chat-history { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         
         .chat-bubble { padding: 15px; border-radius: 10px; font-size: 14px; line-height: 1.6; max-width: 90%; }
         .bubble-ia { background: #f8fafc; border: 1px solid #e2e8f0; color: #334155; align-self: flex-start; }
         .bubble-user { background: #8b5cf6; color: white; align-self: flex-end; font-weight: 600; }
+
+        /* Botones Rápidos IA */
+        .quick-prompts-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; flex-shrink: 0; }
+        .btn-quick-prompt { background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-quick-prompt:hover { background: #8b5cf6; color: white; border-color: #8b5cf6; transform: translateY(-1px); }
         
-        /* Barra de Entrada del Chat Inteligente */
+        /* Barra de Entrada */
         .chat-input-container { display: flex; gap: 10px; border-top: 2px solid #f1f5f9; padding-top: 15px; flex-shrink: 0; }
         .chat-input { flex-grow: 1; padding: 12px 15px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; }
         .chat-input:focus { border-color: #8b5cf6; }
@@ -96,34 +101,30 @@
         .btn-send-chat:hover { opacity: 0.9; }
         .btn-send-chat:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        /* Spinner animación de carga de la IA */
+        /* Spinner */
         .loading-ia { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #8b5cf6; font-weight: 600; gap: 10px; text-align: center; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #8b5cf6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Responsivo para móviles */
         @media (max-width: 768px) {
             .header-left { gap: 10px; }
             .header-logo { height: 26px; padding: 4px 6px; }
             header h1 { font-size: 0.85rem !important; }
-            
             .summary-cards { grid-template-columns: repeat(2, 1fr); }
             .actions-bar { justify-content: center; }
-            
             table, thead, tbody, th, td, tr { display: block; }
             thead tr { display: none; }
             .table-box { border: none; background: transparent; }
-            
             tr { margin-bottom: 12px; border-radius: 10px; border: 1px solid #cbd5e1; padding: 12px; display: flex; flex-wrap: wrap; gap: 8px 0; }
             td { padding: 0; border: none; text-align: left !important; }
-            td::before { display: none; } 
             td:nth-child(1) { width: 50%; order: 1; font-size: 11px; }
             td:nth-child(3) { width: 50%; order: 2; text-align: right !important; }
             td:nth-child(2) { width: 100%; order: 3; }
             td:nth-child(4) { width: 100%; order: 4; font-size: 12px; }
             td:nth-child(5) { width: 100%; order: 5; margin-top: 5px; }
+            .quick-prompts-container { overflow-x: auto; padding-bottom: 5px; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
         }
     </style>
 </head>
@@ -131,7 +132,7 @@
 
 <header>
     <div class="header-left">
-        <img src="643cae93-18fd-40de-9f6c-a08884372e18.png" alt="Logo Municipalidad de Lima" class="header-logo">
+        <img src="643cae93-18fd-40de-9f6c-a08884372e18.png" alt="Logo MML" class="header-logo">
         <div>
             <h1 style="font-size: 1.1rem; color: white; font-weight: 800; margin:0; line-height: 1.2;">SEMÁFORO DE MEDIOS MML</h1>
             <div class="header-credits">Desarrollado por Diego Pongo y Mariel Ramírez</div>
@@ -176,15 +177,15 @@
         <div>
             <label>Fecha</label>
             <div class="date-controls">
-                <button class="btn-action" onclick="setSoloHoy()" title="Noticias de hoy">Hoy</button>
-                <button class="btn-action bg-purple" onclick="setAyerYHoy()" title="Corte: Ayer tarde y Hoy">Ayer+Hoy</button>
-                <button class="btn-action bg-gray" onclick="verMes()" title="Noticias de este mes">Mes</button>
+                <button class="btn-action" onclick="setSoloHoy()">Hoy</button>
+                <button class="btn-action bg-purple" onclick="setAyerYHoy()">Ayer+Hoy</button>
+                <button class="btn-action bg-gray" onclick="verMes()">Mes</button>
                 <input type="date" id="filterFecha" onchange="onFechaChange()">
             </div>
         </div>
         <div>
             <label>Hora de Registro (Desde)</label>
-            <input type="time" id="filterHora" oninput="runFilters()" title="Filtrar notas registradas de esta hora en adelante">
+            <input type="time" id="filterHora" oninput="runFilters()">
         </div>
         <div>
             <label>Etiqueta / Tema</label>
@@ -225,7 +226,7 @@
 
     <div id="btn-ayer-container" style="text-align: center; margin-top: 15px; margin-bottom: 30px; display: none;" data-html2canvas-ignore="true">
         <button id="btn-ayer" class="btn-action bg-gray" style="padding: 10px 20px; font-size: 12px; border-radius: 8px;" onclick="toggleAyer()">
-            ➖ Ocultar notas de ayer (registradas hoy)
+            ➖ Ocultar notas de ayer
         </button>
     </div>
 </div>
@@ -235,16 +236,26 @@
         <div class="modal-header">
             <div class="modal-title">🤖 Analista Político IA</div>
             <div class="modal-actions">
-                <button class="btn-reset-key" onclick="borrarApiKey()">Cambiar API Key</button>
+                <button class="btn-icon" onclick="limpiarChat()" title="Borrar historial para ahorrar límite de datos">🧹 Limpiar Memoria</button>
+                <button class="btn-icon" onclick="borrarApiKey()">🔑 API Key</button>
                 <span class="close-modal" onclick="cerrarModal()">&times;</span>
             </div>
         </div>
         
-        <div id="chat-history">
-            </div>
+        <div id="chat-history"></div>
+
+        <div class="quick-prompts-container">
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🚨 Alerta de Crisis', 'Analiza únicamente las noticias negativas o neutras. Detecta posibles crisis reputacionales, indica su nivel de riesgo (Bajo, Medio, Alto) y propón una acción de mitigación inmediata.')">🚨 Alerta de Crisis</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('📱 Creador de Redes', 'Filtra las noticias positivas y propón: 1) Un hilo de Twitter (X), 2) Un post para Facebook, y 3) Dos ideas de videos cortos (Reels/TikTok) con gancho visual y guion básico.')">📱 Creador Redes</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('👔 Resumen Ejecutivo', 'Redacta un resumen de máximo 3 párrafos para el Alcalde. Destaca lo más urgente, lo más positivo y la recomendación clave del día.')">👔 Resumen Alcaldía</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🛡️ Argumentario', 'Basado en las críticas o noticias negativas, elabora un Argumentario de Defensa. Dame 3 respuestas clave estructuradas para que un vocero defienda la gestión.')">🛡️ Argumentario</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('📊 Narrativas', 'Agrupa las noticias por temas principales. Indica qué medio está impulsando la narrativa y si lo hacen a favor o en contra.')">📊 Narrativas</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🕵️ Fact-Checking', 'Identifica qué titulares o resúmenes usan lenguaje sensacionalista o exagerado y sugiere cómo desmentir o aclarar esa información.')">🕵️ Fact-Checking</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🤝 Stakeholders', 'Identifica qué otras instituciones, ministerios o personajes políticos se mencionan junto a la MML y si la relación mostrada es de colaboración o conflicto.')">🤝 Stakeholders</button>
+        </div>
 
         <div class="chat-input-container">
-            <input type="text" id="userInput" class="chat-input" placeholder="Ej: Redacta un tuit sobre las noticias positivas..." onkeypress="handleEnter(event)">
+            <input type="text" id="userInput" class="chat-input" placeholder="Hazle una pregunta a tus datos o usa los botones rápidos de arriba..." onkeypress="handleEnter(event)">
             <button id="btnSend" class="btn-send-chat" onclick="enviarMensajeUsuario()">Enviar</button>
         </div>
     </div>
@@ -262,26 +273,20 @@
     let currentMode = 'hoy'; 
     let mostrarAyer = true; 
 
-    // Historial de conversación de la IA
     let chatContext = [];
+    let promptInicialIA = ""; 
 
     async function init() {
         try {
             const cacheBusterUrl = csv_url + '&t=' + new Date().getTime();
             const response = await fetch(cacheBusterUrl);
-            
-            if (!response.ok) throw new Error("No se pudo conectar a Google Sheets.");
+            if (!response.ok) throw new Error("Error de conexión a Google Sheets.");
             const csvText = await response.text();
             Papa.parse(csvText, {
-                header: true,
-                skipEmptyLines: 'greedy', 
-                transformHeader: function(h) {
-                    if (!h || h.trim() === "") return "VACIO";
-                    return h.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                },
+                header: true, skipEmptyLines: 'greedy', 
+                transformHeader: h => (!h || h.trim() === "") ? "VACIO" : h.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
                 complete: function(results) {
                     const headers = Object.keys(results.data[0]);
-
                     const cMarcaTemporal = headers.find(h => h.includes('MARCA TEMPORAL')); 
                     const cFecha = headers.find(h => h.includes('FECHA DE PUBLICACION'));
                     const cTitular = headers.find(h => h.includes('TITULAR'));
@@ -292,40 +297,31 @@
                     const cLink = headers.find(h => h.includes('LINK'));
                     const cEtiqueta = headers.find(h => h.includes('ETIQUETA') || h.includes('TEMA'));
 
-                    allData = results.data.map(row => {
-                        return {
-                            marcaTemporal: (row[cMarcaTemporal] || '').trim(), 
-                            fecha: (row[cFecha] || '').trim(),
-                            titular: (row[cTitular] || '').trim(),
-                            medio: (row[cMedio] || '').trim(),
-                            tipoMedio: (row[cTipoMedio] || '').trim(),
-                            tono: (row[cTono] || '').trim(),
-                            resumen: (row[cResumen] || '').trim(),
-                            link: (row[cLink] || '#').trim(),
-                            etiqueta: (cEtiqueta && row[cEtiqueta] ? row[cEtiqueta].trim() : '')
-                        };
-                    }).filter(row => row.titular !== "");
+                    allData = results.data.map(row => ({
+                        marcaTemporal: (row[cMarcaTemporal] || '').trim(), 
+                        fecha: (row[cFecha] || '').trim(),
+                        titular: (row[cTitular] || '').trim(),
+                        medio: (row[cMedio] || '').trim(),
+                        tipoMedio: (row[cTipoMedio] || '').trim(),
+                        tono: (row[cTono] || '').trim(),
+                        resumen: (row[cResumen] || '').trim(),
+                        link: (row[cLink] || '#').trim(),
+                        etiqueta: (cEtiqueta && row[cEtiqueta] ? row[cEtiqueta].trim() : '')
+                    })).filter(row => row.titular !== "");
 
                     allData.reverse(); 
                     generateStaticFilters(allData);
-                    
-                    const y = hoyDate.getFullYear();
-                    const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
-                    const d = String(hoyDate.getDate()).padStart(2, '0');
+                    const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
                     document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
-
                     runFilters();
                 }
             });
-        } catch (error) {
-            document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:40px; color:#b91c1c;">Error: ${error.message}</td></tr>`;
-        }
+        } catch (error) { document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; color:#b91c1c;">Error: ${error.message}</td></tr>`; }
     }
 
     function generateStaticFilters(data) {
         const tonos = [...new Set(data.map(row => row.tono).filter(t => t !== ""))].sort();
         const tiposMedio = [...new Set(data.map(row => row.tipoMedio).filter(m => m !== ""))].sort();
-
         const selectTono = document.getElementById('filterTono');
         const selectTipoMedio = document.getElementById('filterTipoMedio');
         tonos.forEach(t => { selectTono.appendChild(new Option(t, t)); });
@@ -333,119 +329,55 @@
     }
 
     function setSoloHoy() {
-        const y = hoyDate.getFullYear();
-        const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
-        const d = String(hoyDate.getDate()).padStart(2, '0');
+        const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
         document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
         document.getElementById('filterHora').value = '';
-        currentMode = 'hoy';
-        mostrarAyer = false; 
-        runFilters();
+        currentMode = 'hoy'; mostrarAyer = false; runFilters();
     }
-
-    function setAyerYHoy() {
-        document.getElementById('filterFecha').value = '';
-        document.getElementById('filterHora').value = '';
-        currentMode = 'rango_ayer_hoy';
-        mostrarAyer = false; 
-        runFilters();
-    }
-
-    function verMes() {
-        document.getElementById('filterFecha').value = '';
-        document.getElementById('filterHora').value = ''; 
-        currentMode = 'month';
-        mostrarAyer = false;
-        runFilters();
-    }
-
+    function setAyerYHoy() { document.getElementById('filterFecha').value = ''; document.getElementById('filterHora').value = ''; currentMode = 'rango_ayer_hoy'; mostrarAyer = false; runFilters(); }
+    function verMes() { document.getElementById('filterFecha').value = ''; document.getElementById('filterHora').value = ''; currentMode = 'month'; mostrarAyer = false; runFilters(); }
     function onFechaChange() {
         const val = document.getElementById('filterFecha').value;
-        const y = hoyDate.getFullYear();
-        const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
-        const d = String(hoyDate.getDate()).padStart(2, '0');
-        if (val === `${y}-${m}-${d}`) {
-            currentMode = 'hoy';
-            mostrarAyer = false; 
-        } else {
-            currentMode = val ? 'specific' : 'month'; 
-            mostrarAyer = false;
-        }
+        const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
+        if (val === `${y}-${m}-${d}`) { currentMode = 'hoy'; mostrarAyer = false; } else { currentMode = val ? 'specific' : 'month'; mostrarAyer = false; }
         runFilters();
     }
-
-    function toggleAyer() {
-        mostrarAyer = !mostrarAyer;
-        runFilters();
-    }
-
+    function toggleAyer() { mostrarAyer = !mostrarAyer; runFilters(); }
     function resetFilters() {
-        const y = hoyDate.getFullYear();
-        const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
-        const d = String(hoyDate.getDate()).padStart(2, '0');
-
-        document.getElementById('search').value = '';
-        document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
-        document.getElementById('filterHora').value = '';
-        document.getElementById('filterEtiqueta').value = '';
-        document.getElementById('filterTono').value = '';
-        document.getElementById('filterTipoMedio').value = '';
-        
-        currentMode = 'hoy';
-        mostrarAyer = true; 
-        runFilters();
+        const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
+        document.getElementById('search').value = ''; document.getElementById('filterFecha').value = `${y}-${m}-${d}`; document.getElementById('filterHora').value = '';
+        document.getElementById('filterEtiqueta').value = ''; document.getElementById('filterTono').value = ''; document.getElementById('filterTipoMedio').value = '';
+        currentMode = 'hoy'; mostrarAyer = true; runFilters();
     }
 
     function downloadExcel() {
         if (currentFilteredData.length === 0) return alert("No hay datos para descargar.");
         const dataParaExcel = currentFilteredData.map(row => ({
-            'Fecha Registro': row.marcaTemporal, 
-            'Fecha Noticia': row.fecha,
-            'Titular': row.titular,
-            'Medio': row.medio,
-            'Tipo de Medio': row.tipoMedio,
-            'Tono': row.tono,
-            'Resumen': row.resumen,
-            'Etiqueta': row.etiqueta,
-            'Enlace': row.link
+            'Fecha Registro': row.marcaTemporal, 'Fecha Noticia': row.fecha, 'Titular': row.titular, 'Medio': row.medio,
+            'Tipo de Medio': row.tipoMedio, 'Tono': row.tono, 'Resumen': row.resumen, 'Etiqueta': row.etiqueta, 'Enlace': row.link
         }));
         const csvString = Papa.unparse(dataParaExcel);
         const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", "Semaforo_MML_Reporte.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", "Semaforo_MML.csv");
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
     function downloadPDF() {
         const elemento = document.getElementById('dashboard-content');
         const btnAyer = document.getElementById('btn-ayer-container');
         btnAyer.style.display = 'none'; 
-        
-        const opciones = {
-            margin:       0.3,
-            filename:     'Semaforo_MML_Reporte.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
-        };
-        html2pdf().set(opciones).from(elemento).save().then(() => {
-            if(currentMode === 'hoy') btnAyer.style.display = 'block';
-        });
+        const opciones = { margin: 0.3, filename: 'Semaforo_MML.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
+        html2pdf().set(opciones).from(elemento).save().then(() => { if(currentMode === 'hoy') btnAyer.style.display = 'block'; });
     }
 
     function parseExcelDate(dateStr) {
         if (!dateStr) return null;
-        const clean = dateStr.split(' ')[0].trim();
-        const p = clean.split('/');
+        const p = dateStr.split(' ')[0].trim().split('/');
         if(p.length !== 3) return null;
-        const d = parseInt(p[0], 10);
-        const m = parseInt(p[1], 10) - 1;
-        let y = parseInt(p[2], 10);
-        if (y < 100) y += 2000;
+        const d = parseInt(p[0], 10), m = parseInt(p[1], 10) - 1;
+        let y = parseInt(p[2], 10); if (y < 100) y += 2000;
         return new Date(y, m, d).getTime();
     }
 
@@ -453,19 +385,12 @@
         if (!marcaTemporalStr) return -1;
         const parts = marcaTemporalStr.trim().split(/\s+/);
         if (parts.length < 2) return -1;
-        const timePart = parts[1]; 
-        const timeParts = timePart.split(':');
-        let h = parseInt(timeParts[0], 10);
-        let m = parseInt(timeParts[1], 10);
-        if (isNaN(h)) return -1;
-        if (isNaN(m)) m = 0;
-        let offset = 0;
-        const fullStr = marcaTemporalStr.toLowerCase();
-        if (fullStr.includes('p.m.') || fullStr.includes('pm') || fullStr.includes('p. m.')) {
-            if (h < 12) offset = 12 * 60;
-        } else if (fullStr.includes('a.m.') || fullStr.includes('am') || fullStr.includes('a. m.')) {
-            if (h === 12) h = 0;
-        }
+        const timeParts = parts[1].split(':');
+        let h = parseInt(timeParts[0], 10), m = parseInt(timeParts[1], 10);
+        if (isNaN(h)) return -1; if (isNaN(m)) m = 0;
+        let offset = 0; const fullStr = marcaTemporalStr.toLowerCase();
+        if (fullStr.includes('p.m.') || fullStr.includes('pm')) { if (h < 12) offset = 12 * 60; } 
+        else if (fullStr.includes('a.m.') || fullStr.includes('am')) { if (h === 12) h = 0; }
         return (h * 60) + m + offset;
     }
 
@@ -478,47 +403,27 @@
     }
 
     function runFilters() {
-        const search = document.getElementById('search').value.toLowerCase();
-        const tono = document.getElementById('filterTono').value;
-        const tipoMedio = document.getElementById('filterTipoMedio').value;
-        const fechaInput = document.getElementById('filterFecha').value; 
-        const horaInput = document.getElementById('filterHora').value; 
-        const etiquetaPrevia = document.getElementById('filterEtiqueta').value;
+        const search = document.getElementById('search').value.toLowerCase(), tono = document.getElementById('filterTono').value, tipoMedio = document.getElementById('filterTipoMedio').value;
+        const fechaInput = document.getElementById('filterFecha').value, horaInput = document.getElementById('filterHora').value, etiquetaPrevia = document.getElementById('filterEtiqueta').value;
         let minMinutes = -1;
-        if (horaInput) {
-            const [hInput, mInput] = horaInput.split(':');
-            minMinutes = parseInt(hInput, 10) * 60 + parseInt(mInput, 10);
-        }
+        if (horaInput) { const [hInput, mInput] = horaInput.split(':'); minMinutes = parseInt(hInput, 10) * 60 + parseInt(mInput, 10); }
 
-        const btnAyerContainer = document.getElementById('btn-ayer-container');
-        const btnAyer = document.getElementById('btn-ayer');
-        if (currentMode === 'hoy') {
-            btnAyerContainer.style.display = 'block';
-            btnAyer.innerHTML = mostrarAyer ? "➖ Ocultar notas de ayer (registradas hoy)" : "➕ Incluir notas de ayer (registradas hoy)";
-        } else {
-            btnAyerContainer.style.display = 'none';
-        }
+        const btnAyerContainer = document.getElementById('btn-ayer-container'), btnAyer = document.getElementById('btn-ayer');
+        if (currentMode === 'hoy') { btnAyerContainer.style.display = 'block'; btnAyer.innerHTML = mostrarAyer ? "➖ Ocultar notas de ayer" : "➕ Incluir notas de ayer"; } else { btnAyerContainer.style.display = 'none'; }
 
         const dateFiltered = allData.filter(row => {
             const rowTime = parseExcelDate(row.fecha); 
             if (!rowTime) return true;
-            const rowDateObj = new Date(rowTime);
-            const rY = rowDateObj.getFullYear();
-            const rM = rowDateObj.getMonth();
-
+            const rY = new Date(rowTime).getFullYear(), rM = new Date(rowTime).getMonth();
             if (currentMode === 'hoy') {
                 if (rowTime === hoyTime) return true; 
-                if (mostrarAyer && rowTime === ayerTime) {
-                    const rowRegistroTime = parseExcelDate(row.marcaTemporal); 
-                    if (rowRegistroTime === hoyTime) return true; 
-                }
+                if (mostrarAyer && rowTime === ayerTime) { if (parseExcelDate(row.marcaTemporal) === hoyTime) return true; }
                 return false;
             } 
             else if (currentMode === 'rango_ayer_hoy') { return (rowTime === ayerTime || rowTime === hoyTime); }
             else if (currentMode === 'specific' && fechaInput) {
                 const [yInput, mInput, dInput] = fechaInput.split('-');
-                const targetTime = new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime();
-                return (rowTime === targetTime);
+                return (rowTime === new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime());
             } 
             else if (currentMode === 'month') { return (rY === hoyDate.getFullYear() && rM === hoyDate.getMonth()); }
             return true; 
@@ -527,184 +432,137 @@
         updateDynamicEtiquetas(dateFiltered, etiquetaPrevia);
         const etiquetaActual = document.getElementById('filterEtiqueta').value;
 
-        const finalFiltered = dateFiltered.filter(row => {
-            const txt = (row.titular + " " + row.resumen).toLowerCase();
-            const matchSearch = search === "" || txt.includes(search);
+        currentFilteredData = dateFiltered.filter(row => {
+            const matchSearch = search === "" || (row.titular + " " + row.resumen).toLowerCase().includes(search);
             const matchTono = tono === "" || row.tono === tono;
             const matchTipoMedio = tipoMedio === "" || row.tipoMedio === tipoMedio;
             const matchEtiqueta = etiquetaActual === "" || row.etiqueta === etiquetaActual;
-            
             let matchHora = true;
             if (minMinutes >= 0) {
                 const rowMins = getMinutesFromMarcaTemporal(row.marcaTemporal);
                 if (currentMode === 'rango_ayer_hoy') {
-                    const rowFechaVal = parseExcelDate(row.fecha);
-                    if (rowFechaVal === ayerTime) {
-                        const marcaFechaVal = parseExcelDate(row.marcaTemporal);
-                        if (marcaFechaVal === hoyTime) matchHora = true;
+                    if (parseExcelDate(row.fecha) === ayerTime) {
+                        if (parseExcelDate(row.marcaTemporal) === hoyTime) matchHora = true;
                         else if (rowMins !== -1 && rowMins < minMinutes) matchHora = false;
                     }
-                } else {
-                    if (rowMins !== -1 && rowMins < minMinutes) matchHora = false;
-                }
+                } else { if (rowMins !== -1 && rowMins < minMinutes) matchHora = false; }
             }
             return matchSearch && matchTono && matchTipoMedio && matchEtiqueta && matchHora;
         });
-        
-        currentFilteredData = finalFiltered;
 
         let countPos = 0, countNeu = 0, countNeg = 0;
-        finalFiltered.forEach(row => {
+        currentFilteredData.forEach(row => {
             const tLow = row.tono.toLowerCase();
-            if (tLow.includes('pos')) countPos++;
-            else if (tLow.includes('neg')) countNeg++;
-            else countNeu++;
+            if (tLow.includes('pos')) countPos++; else if (tLow.includes('neg')) countNeg++; else countNeu++;
         });
-        document.getElementById('count-total').innerText = finalFiltered.length;
+        document.getElementById('count-total').innerText = currentFilteredData.length;
         document.getElementById('count-pos').innerText = countPos;
         document.getElementById('count-neu').innerText = countNeu;
         document.getElementById('count-neg').innerText = countNeg;
-
-        renderTable(finalFiltered, horaInput);
+        renderTable(currentFilteredData, horaInput);
     }
 
     function renderTable(data, horaInput) {
         const tbody = document.getElementById('table-body');
-        const countBox = document.getElementById('data-count');
         tbody.innerHTML = '';
-        
         const displayData = data.slice(0, 300);
-        let textoConteo = currentMode === 'hoy' ? (mostrarAyer ? "Mostrando: Hoy + Rezagos de ayer" : "Mostrando: Solo Hoy") : 
-                          currentMode === 'rango_ayer_hoy' ? "Mostrando: Ayer y Hoy" :
-                          currentMode === 'specific' ? "Mostrando Fecha Seleccionada" : 
-                          currentMode === 'month' ? "Mostrando: Este Mes" : "Mostrando Datos";
         
-        if (horaInput) textoConteo += currentMode === 'rango_ayer_hoy' ? ` (Ayer desde las ${horaInput} y todo hoy)` : ` (Desde las ${horaInput})`;
+        let textoConteo = currentMode === 'hoy' ? (mostrarAyer ? "Hoy + Rezagos de ayer" : "Solo Hoy") : currentMode === 'rango_ayer_hoy' ? "Ayer y Hoy" : currentMode === 'specific' ? "Fecha Seleccionada" : "Este Mes";
+        document.getElementById('data-count').innerText = `Mostrando: ${textoConteo}` + (horaInput ? ` (Desde ${horaInput})` : "");
         
-        countBox.innerText = `${textoConteo}`;
-        if (displayData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b; border:none;">No hay noticias para mostrar con estos filtros.</td></tr>`;
-            return;
-        }
+        if (displayData.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b; border:none;">No hay noticias.</td></tr>`; return; }
 
         displayData.forEach(row => {
             const tLow = row.tono.toLowerCase();
-            let badgeClass = 'badge-neutro';
-            let rowStyle = '';
-
+            let badgeClass = 'badge-neutro', rowStyle = 'background-color: #fde047;';
             if (tLow.includes('pos')) { badgeClass = 'badge-positivo'; rowStyle = 'background-color: #86efac;'; } 
             else if (tLow.includes('neg')) { badgeClass = 'badge-negativo'; rowStyle = 'background-color: #fc8181;'; } 
-            else { badgeClass = 'badge-neutro'; rowStyle = 'background-color: #fde047;'; }
             
-            const linkHTML = row.link.includes('http') ? `<a href="${row.link}" target="_blank" class="btn-link">Abrir Nota</a>` : `<span style="color:#64748b; font-size:11px; display:block; text-align:center; padding:6px 0;">Sin Enlace</span>`;
+            const linkHTML = row.link.includes('http') ? `<a href="${row.link}" target="_blank" class="btn-link">Abrir Nota</a>` : `<span style="color:#64748b; font-size:11px;">Sin Enlace</span>`;
             let horaRegistro = "";
-            if(row.marcaTemporal) {
-                const parts = row.marcaTemporal.trim().split(/\s+/);
-                if(parts.length >= 2) horaRegistro = `<div style="font-size:10px; color:rgba(0,0,0,0.65); font-weight:600; margin-top:4px;">Registrado: ${parts[1]}</div>`;
-            }
+            if(row.marcaTemporal) { const parts = row.marcaTemporal.trim().split(/\s+/); if(parts.length >= 2) horaRegistro = `<div style="font-size:10px; color:rgba(0,0,0,0.65); font-weight:600; margin-top:4px;">${parts[1]}</div>`; }
 
-            tbody.innerHTML += `
-                <tr style="${rowStyle}">
-                    <td data-label="Fecha"><div style="font-weight:700;">${row.fecha}</div>${horaRegistro}</td>
-                    <td data-label="Noticia"><div style="font-weight:800; margin-bottom:5px; font-size:13px;">${row.titular}</div><div style="font-size:10px; color:var(--primary); font-weight:800; text-transform:uppercase;">${row.medio} <span style="color:#64748b;">(${row.tipoMedio})</span></div></td>
-                    <td data-label="Tono"><span class="badge ${badgeClass}">${row.tono}</span></td>
-                    <td data-label="Resumen" style="font-weight:600;">${row.resumen}</td>
-                    <td data-label="Enlace" style="text-align:center;">${linkHTML}</td>
-                </tr>
-            `;
+            tbody.innerHTML += `<tr style="${rowStyle}"><td data-label="Fecha"><div style="font-weight:700;">${row.fecha}</div>${horaRegistro}</td><td data-label="Noticia"><div style="font-weight:800; margin-bottom:5px; font-size:13px;">${row.titular}</div><div style="font-size:10px; color:var(--primary); font-weight:800;">${row.medio}</div></td><td data-label="Tono"><span class="badge ${badgeClass}">${row.tono}</span></td><td data-label="Resumen" style="font-weight:600;">${row.resumen}</td><td data-label="Enlace" style="text-align:center;">${linkHTML}</td></tr>`;
         });
     }
 
     /* ==========================================================
-       MÓDULO DE INTELIGENCIA ARTIFICIAL INTERACTIVA
+       MÓDULO DE INTELIGENCIA ARTIFICIAL INTERACTIVA OPTIMIZADO
        ========================================================== */
 
     function obtenerApiKey() {
         let key = localStorage.getItem('gemini_api_key_mml');
-        if (!key) {
-            key = prompt("Por seguridad, ingresa tu API Key de Gemini. Se guardará localmente en tu navegador y no será visible en el código.");
-            if (key) {
-                localStorage.setItem('gemini_api_key_mml', key.trim());
-            }
-        }
+        if (!key) { key = prompt("Ingresa tu API Key de Gemini. Se guardará localmente."); if (key) localStorage.setItem('gemini_api_key_mml', key.trim()); }
         return key;
     }
 
-    function borrarApiKey() {
-        localStorage.removeItem('gemini_api_key_mml');
-        alert("API Key eliminada de la memoria local. Vuelve a hacer clic en 'Analizar con IA' para ingresar una nueva.");
-        cerrarModal();
+    function borrarApiKey() { localStorage.removeItem('gemini_api_key_mml'); alert("API Key eliminada."); cerrarModal(); }
+
+    function construirPromptInicial() {
+        // OPTIMIZACIÓN: Solo tomamos las primeras 60 notas para no saturar los tokens
+        const dataOptimizada = currentFilteredData.slice(0, 60);
+        let textoNoticias = `BASE DE DATOS ACTUAL A ANALIZAR (Muestra de ${dataOptimizada.length} notas relevantes):\n\n`;
+        
+        dataOptimizada.forEach((row, index) => {
+            // Solo pasamos Titular, Medio, Tono y Resumen (ahorramos links y fechas)
+            textoNoticias += `N${index + 1}: [${row.tono}] ${row.medio} | ${row.titular} - ${row.resumen}\n`;
+        });
+
+        promptInicialIA = `Eres un Consultor Senior de Estrategia Política de la Municipalidad de Lima. Basa tus respuestas ÚNICAMENTE en este contexto:\n\n${textoNoticias}\n\nREGLA: Respuestas directas, profesionales y en Markdown limpio.`;
     }
 
     function abrirAnalistaIA() {
         const apiKey = obtenerApiKey();
-        if (!apiKey) return; // Si canceló el prompt, no abre.
-
+        if (!apiKey) return;
+        
         const modal = document.getElementById('iaModal');
-        const chatHistory = document.getElementById('chat-history');
-        
-        chatContext = []; // Reiniciamos el contexto
-        chatHistory.innerHTML = ''; // Limpiamos el chat
-        document.getElementById('userInput').value = '';
-        
         modal.style.display = "flex";
 
         if (currentFilteredData.length === 0) {
-            agregarBurbuja("No hay noticias cargadas en la tabla con los filtros actuales. Cambia los filtros e intenta de nuevo.", "ia");
+            document.getElementById('chat-history').innerHTML = '';
+            agregarBurbuja("No hay noticias cargadas en la tabla con los filtros actuales.", "ia");
             return;
         }
 
-        // Creamos la base de datos de noticias oculta para pasarla como contexto
-        let textoNoticias = "BASE DE DATOS ACTUAL A ANALIZAR:\n\n";
-        currentFilteredData.forEach((row, index) => {
-            textoNoticias += `Nota #${index + 1}:\n- Titular: ${row.titular}\n- Medio: ${row.medio}\n- Tono: ${row.tono}\n- Resumen: ${row.resumen}\n----------------------\n`;
-        });
-
-        // Configuración inicial del sistema
-        const promptEstrategico = `Actúa como un Consultor Senior de Estrategia Política y Analista Institucional para la Municipalidad de Lima. 
-Aquí tienes las noticias filtradas hoy (${currentFilteredData.length} menciones):\n\n${textoNoticias}\n\n
-Por favor, entrégame el Reporte Ejecutivo Inicial con estas 4 secciones estrictas (usa Markdown limpio):
-### 1. 📊 BALANCE REPUTACIONAL Y EDITORIAL
-### 2. 🚨 ALERTAS Y CRISIS DETECTADAS
-### 3. 🎯 TEMAS CLAVE
-### 4. 💡 RECOMENDACIONES DE COMUNICACIÓN`;
-
-        // Añadimos el prompt inicial oculto a la memoria
-        chatContext.push({ role: "user", parts: [{ text: promptEstrategico }] });
-
-        // Mostramos el spinner y llamamos a la API
-        agregarSpinner();
-        procesarConIA(chatContext);
+        // Si es la primera vez que se abre con este filtro, genera el reporte automático
+        construirPromptInicial();
+        limpiarChat(false); // Limpia pero arranca con el reporte general
     }
 
-    function cerrarModal() {
-        document.getElementById('iaModal').style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('iaModal');
-        if (event.target == modal) {
-            modal.style.display = "none";
+    function limpiarChat(mostrarMensajeVacio = true) {
+        document.getElementById('chat-history').innerHTML = '';
+        chatContext = [{ role: "user", parts: [{ text: promptInicialIA }] }];
+        
+        if (mostrarMensajeVacio) {
+            agregarBurbuja("Memoria borrada. ✨ He olvidado la conversación anterior para ahorrar datos. ¿Qué deseas analizar ahora?", "ia");
+        } else {
+            // Reporte Inicial por defecto
+            chatContext.push({ role: "user", parts: [{ text: "Haz un Reporte Ejecutivo Inicial con estas 4 secciones: 1. BALANCE REPUTACIONAL, 2. ALERTAS Y CRISIS, 3. TEMAS CLAVE, 4. RECOMENDACIONES." }] });
+            agregarSpinner();
+            procesarConIA(chatContext);
         }
     }
 
-    function handleEnter(event) {
-        if (event.key === "Enter") enviarMensajeUsuario();
-    }
+    function cerrarModal() { document.getElementById('iaModal').style.display = "none"; }
+    window.onclick = function(event) { if (event.target == document.getElementById('iaModal')) cerrarModal(); }
+
+    function handleEnter(event) { if (event.key === "Enter") enviarMensajeUsuario(); }
 
     function enviarMensajeUsuario() {
         const input = document.getElementById('userInput');
         const texto = input.value.trim();
         if (!texto) return;
-
-        // Mostrar burbuja del usuario
-        agregarBurbuja(texto, "user");
         input.value = '';
+        ejecutarPrompt(texto, texto);
+    }
 
-        // Añadir al contexto de memoria
-        chatContext.push({ role: "user", parts: [{ text: texto }] });
+    function enviarPromptRapido(titulo, promptOculto) {
+        ejecutarPrompt(titulo, promptOculto);
+    }
 
-        // Enviar a la API
+    function ejecutarPrompt(textoMostrado, textoOcultoIA) {
+        agregarBurbuja(textoMostrado, "user");
+        chatContext.push({ role: "user", parts: [{ text: textoOcultoIA }] });
         agregarSpinner();
         procesarConIA(chatContext);
     }
@@ -713,26 +571,19 @@ Por favor, entrégame el Reporte Ejecutivo Inicial con estas 4 secciones estrict
         const chatHistory = document.getElementById('chat-history');
         const div = document.createElement('div');
         div.className = `chat-bubble bubble-${sender} ia-response`;
-        
-        if (sender === 'ia') {
-            div.innerHTML = convertirMarkdownAModal(texto);
-        } else {
-            div.textContent = texto; // Texto plano para el usuario
-        }
-        
+        if (sender === 'ia') div.innerHTML = convertirMarkdownAModal(texto);
+        else div.textContent = texto; 
         chatHistory.appendChild(div);
-        chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll al final
+        chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
     function agregarSpinner() {
         const chatHistory = document.getElementById('chat-history');
         const div = document.createElement('div');
-        div.id = "temp-spinner";
-        div.className = "loading-ia";
-        div.innerHTML = `<div class="spinner"></div><div style="font-size:12px; color:#64748b;">Analizando datos...</div>`;
+        div.id = "temp-spinner"; div.className = "loading-ia";
+        div.innerHTML = `<div class="spinner"></div><div style="font-size:12px; color:#64748b;">Analizando...</div>`;
         chatHistory.appendChild(div);
         chatHistory.scrollTop = chatHistory.scrollHeight;
-        
         document.getElementById('btnSend').disabled = true;
     }
 
@@ -744,42 +595,29 @@ Por favor, entrégame el Reporte Ejecutivo Inicial con estas 4 secciones estrict
 
     async function procesarConIA(historial) {
         const apiKey = obtenerApiKey();
-        
         try {
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: historial })
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: historial })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                if (errorData.error?.message?.includes("API key not valid") || errorData.error?.message?.includes("leaked")) {
-                    borrarApiKey();
-                    throw new Error("La API Key es inválida o fue bloqueada por Google. Se ha borrado de tu sistema. Genera una nueva en AI Studio y vuelve a intentar.");
-                }
-                throw new Error(errorData.error?.message || "Error al contactar con la API.");
-            }
+            if (!response.ok) throw new Error((await response.json()).error?.message || "Error al contactar con la API.");
 
             const data = await response.json();
             const respuestaIA = data.candidates[0].content.parts[0].text;
-
-            // Guardar en el historial de la IA
             chatContext.push({ role: "model", parts: [{ text: respuestaIA }] });
-            
-            quitarSpinner();
-            agregarBurbuja(respuestaIA, "ia");
+            quitarSpinner(); agregarBurbuja(respuestaIA, "ia");
 
         } catch (error) {
             quitarSpinner();
-            agregarBurbuja(`❌ Error de sistema: ${error.message}`, "ia");
+            agregarBurbuja(`❌ Error: ${error.message}. \n\n*Consejo: Si es un error de límite (Quota exceeded), dale clic al botón '🧹 Limpiar Memoria' e intenta de nuevo.*`, "ia");
         }
     }
 
     function convertirMarkdownAModal(texto) {
         return texto
-            .replace(/^### (.*$)/gim, '<h3 style="color:#002f80; margin-top:20px; margin-bottom:10px; font-weight:800; font-size:15px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">$1</h3>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a; font-weight:700;">$1</strong>')
+            .replace(/^### (.*$)/gim, '<h3 style="color:#002f80; margin-top:20px; margin-bottom:10px; font-size:15px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">$1</h3>')
+            .replace(/^## (.*$)/gim, '<h2 style="color:#002f80; margin-top:20px; margin-bottom:10px; font-size:17px;">$1</h2>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a;">$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
             .replace(/\n/g, '<br>');
     }
