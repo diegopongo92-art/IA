@@ -91,14 +91,13 @@
 </div>
 
 <script>
-    // URL simulada para el flujo local (PapaParse cargará tus datos reales desde tu link de Sheets aquí)
     let todasLasNoticias = [];
 
     // Clave de API blindada contra escaneos automáticos de GitHub
     const apiKey = "AIzaSyCyGrUUejUbRAAU" + "tT9VmGs-oSbJj-TXJ_k";
 
     function init() {
-        // Datos de respaldo estructurados idénticos a tu Google Sheets
+        // Datos puente estructurados idénticos a tu Google Sheets
         todasLasNoticias = [
             { medio: "El Comercio", titular: "Municipalidad de Lima acelera obras estructurales en Vía Expresa Sur", tono: "Positivo", resumen: "Trabajos avanzan a ritmo acelerado para conectar distritos del sur." },
             { medio: "La República", titular: "Comerciantes protestan por desvíos de tránsito en obras del Centro de Lima", tono: "Negativo", resumen: "Exigen compensaciones por reducción de ventas durante la campaña." },
@@ -106,8 +105,6 @@
         ];
         
         renderTable(todasLasNoticias);
-        
-        // Ejecutamos la IA inmediatamente al cargar la data
         activarAnalistaPoliticoIA(todasLasNoticias);
     }
 
@@ -126,7 +123,7 @@
         document.getElementById('tabla-contenedor').innerHTML = html;
     }
 
-    // 🤖 FUNCIÓN REPARADA CON LA URL OFICIAL COMPATIBLE (V1 + LATEST)
+    // 🤖 URL OFICIAL CORREGIDA PARA LA API v1 ESTABLE
     async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
         if (!noticiasParaAnalizar || noticiasParaAnalizar.length === 0) {
             document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #64748b; font-style: italic;'>No hay noticias suficientes para estructurar un análisis de coyuntura.</span>";
@@ -135,10 +132,9 @@
 
         document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #3b82f6; font-style: italic;'>El analista político está procesando el impacto institucional en vivo...</span>";
 
-        // URL definitiva configurada con el alias global estable de Google
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+        // MÁXIMA COMPATIBILIDAD: Ruta v1 + nombre del modelo limpio
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-        // Reducimos el paquete de noticias a las últimas 15 para no saturar los caracteres de la consulta
         const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
             medio: nota.medio || "Prensa",
             titulo: nota.titular || nota.titulo || "Sin título",
@@ -176,10 +172,9 @@
             
             if (responseData.candidates && responseData.candidates.length > 0) {
                 const textoAnalisis = responseData.candidates[0].content.parts[0].text;
-                // Inyectamos el análisis limpio en el contenedor azul
                 document.getElementById('caja-analisis-ia').innerHTML = textoAnalisis;
             } else {
-                console.error("Respuesta inusual de Google:", responseData);
+                console.error("Respuesta de Google:", responseData);
                 document.getElementById('caja-analisis-ia').innerHTML = `<em>IA en mantenimiento temporal: ${responseData.error?.message || 'Error de sincronización estructural'}</em>`;
             }
         } catch (error) {
