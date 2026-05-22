@@ -563,7 +563,6 @@
         document.getElementById('count-neg').innerText = countNeg;
 
         renderTable(finalFiltered, horaInput);
-
         ejecutarAnalisisIAConFiltros(finalFiltered);
     }
 
@@ -640,7 +639,7 @@
         });
     }
 
-    // 🤖 LÓGICA DE IA CON SISTEMA AUTO-DETECT REFORZADO (SIN ERRORES)
+    // 🤖 LÓGICA ULTRA-BLINDADA DE CONEXIÓN DIRECTA CON TOLERANCIA A ERRORES
     async function ejecutarAnalisisIAConFiltros(noticiasFiltradas) {
         controlTokenIA++;
         const tokenActual = controlTokenIA;
@@ -655,79 +654,84 @@
         }
 
         pulso.style.animation = 'pulsoIA 1s infinite';
-        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Interrogando servidor de Google y auto-detectando modelo activo...</span>`;
+        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Analizando ${noticiasFiltradas.length} menciones activas... Evaluando tendencias e impacto político...</span>`;
 
         const sPart1 = "AIzaSyC3SyvPVlkPo8";
         const sPart2 = "CLI76vdgCnDFkbTbJ03-4";
         const apiKey = sPart1 + sPart2;
 
-        try {
-            // PASO 1: Descubrir qué nombres de modelos tiene permitidos la API key en este momento
-            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-            const listResponse = await fetch(listUrl);
-            const listData = await listResponse.json();
+        const resumenCoyuntura = noticiasFiltradas.slice(0, 45).map((n, idx) => {
+            return `[${idx+1}] (${n.tono}) Medio: ${n.medio} | Titulo: ${n.titular} | Resumen: ${n.resumen}`;
+        }).join("\n");
 
-            if (!listData.models) throw new Error("No se pudo obtener la lista interna del servidor.");
+        const prompt = `Actúa como un Analista Político Experto especializado en la gestión pública de la Municipalidad Metropolitana de Lima (MML). Analiza el siguiente set de noticias extraídas del semáforo de medios institucional y genera un informe de coyuntura sumamente sintético y ejecutivo estructurado exactamente así:
+        
+        1. **DIAGNÓSTICO EXPRESS**: Un párrafo corto de máximo 3 líneas resumiendo el balance de la agenda del día o periodo seleccionado, identificando los temas centrales dominantes.
+        2. **ALERTAS CRÍTICAS / FOCOS DE CONFLICTO**: Dos viñetas rápidas sobre las crisis, críticas o notas negativas con mayor potencial de daño reputacional para la municipalidad o el alcalde. Si no las hay, indícalo con un tono positivo.
+        3. **OPORTUNIDADES / APUNTES ESTRATÉGICOS**: Dos viñetas breves que resalten hitos, avances positivos o temas neutros/positivos que la MML debería amplificar y capitalizar comunicacionalmente.
 
-            const modelosValidos = listData.models.filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"));
-            if (modelosValidos.length === 0) throw new Error("El token no cuenta con modelos de generación activos.");
+        Sé directo, analítico, profesional y muy ejecutivo. Evita rodeos técnicos o introducciones innecesarias.
+        
+        Aquí están los datos vigentes para el análisis de coyuntura:\n${resumenCoyuntura}`;
 
-            // Prioridad de autodetección (Flash -> Pro -> Primer disponible)
-            let modeloElegido = "";
-            const modeloFlash = modelosValidos.find(m => m.name.includes("gemini-1.5-flash"));
-            const modeloPro = modelosValidos.find(m => m.name.includes("gemini-1.5-pro"));
-            
-            if (modeloFlash) modeloElegido = modeloFlash.name;
-            else if (modeloPro) modeloElegido = modeloPro.name;
-            else modeloElegido = modelosValidos[0].name;
+        // Lista de modelos a los que intentaremos llamar en cascada si uno falla o está bloqueado
+        const modelosEnCascada = [
+            "models/gemini-1.5-flash",
+            "models/gemini-1.5-pro",
+            "models/gemini-2.5-flash"
+        ];
 
-            if (tokenActual !== controlTokenIA) return;
-            cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Modelo [${modeloElegido.split('/').pop()}] enlazado. Procesando impacto político de las ${noticiasFiltradas.length} menciones vigentes...</span>`;
+        let exito = false;
+        let ultimoError = "";
 
-            // PASO 2: Construir el endpoint definitivo con el nombre real que devolvió Google
-            const endpointDefinitivo = `https://generativelanguage.googleapis.com/v1beta/${modeloElegido}:generateContent?key=${apiKey}`;
+        // Bucle de reintentos inteligente en caliente
+        for (let i = 0; i < modelosEnCascada.length; i++) {
+            if (tokenActual !== controlTokenIA) return; // Si el usuario cambió de filtro mientras tanto, abortar inmediatamente
 
-            const resumenCoyuntura = noticiasFiltradas.slice(0, 45).map((n, idx) => {
-                return `[${idx+1}] (${n.tono}) Medio: ${n.medio} | Titulo: ${n.titular} | Resumen: ${n.resumen}`;
-            }).join("\n");
+            const modeloIntento = modelosEnCascada[i];
+            try {
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modeloIntento}:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
 
-            const prompt = `Actúa como un Analista Político Experto especializado en la gestión pública de la Municipalidad Metropolitana de Lima (MML). Analiza el siguiente set de noticias extraídas del semáforo de medios institucional y genera un informe de coyuntura sumamente sintético y ejecutivo estructurado exactamente así:
-            
-            1. **DIAGNÓSTICO EXPRESS**: Un párrafo corto de máximo 3 líneas resumiendo el balance de la agenda del día o periodo seleccionado, identificando los temas centrales dominantes.
-            2. **ALERTAS CRÍTICAS / FOCOS DE CONFLICTO**: Dos viñetas rápidas sobre las crisis, críticas o notas negativas con mayor potencial de daño reputacional para la municipalidad o el alcalde. Si no las hay, indícalo con un tono positivo.
-            3. **OPORTUNIDADES / APUNTES ESTRATÉGICOS**: Dos viñetas breves que resalten hitos, avances positivos o temas neutros/positivos que la MML debería amplificar y capitalizar comunicacionalmente.
+                if (!response.ok) {
+                    throw new Error(`El servidor rechazó el modelo ${modeloIntento.split('/').pop()}`);
+                }
 
-            Sé directo, analítico, profesional y muy ejecutivo. Evita rodeos técnicos o introducciones innecesarias.
-            
-            Aquí están los datos vigentes para el análisis de coyuntura:\n${resumenCoyuntura}`;
-
-            const response = await fetch(endpointDefinitivo, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-
-            if (!response.ok) throw new Error("Fallo en la comunicación en el bloque final de generación.");
-
-            const jsonResponse = await response.json();
-            const textoCrudoIA = jsonResponse.candidates[0].content.parts[0].text;
-
-            if (tokenActual !== controlTokenIA) return;
-
-            cajaIA.innerHTML = procesarMarkdownAI(textoCrudoIA);
-        } catch (err) {
-            if (tokenActual === controlTokenIA) {
-                cajaIA.innerHTML = `<span style="color: #ef4444; font-weight: 600;">⚠️ Nota del sistema: No se pudo generar el análisis automatizado en este instante (${err.message}). Por favor reintente cambiando de filtro.</span>`;
+                const jsonResponse = await response.json();
+                
+                if (jsonResponse.candidates && jsonResponse.candidates[0].content.parts[0].text) {
+                    const textoCrudoIA = jsonResponse.candidates[0].content.parts[0].text;
+                    
+                    if (tokenActual === controlTokenIA) {
+                        cajaIA.innerHTML = procesarMarkdownAI(textoCrudoIA);
+                    }
+                    exito = true;
+                    break; // Salir del bucle porque ya funcionó
+                }
+            } catch (err) {
+                ultimoError = err.message;
+                // Si falla, el bucle continúa silenciosamente e intenta el siguiente modelo de la lista
             }
-        } finally {
-            if (tokenActual === controlTokenIA) {
-                pulso.style.animation = 'none';
-            }
+        }
+
+        // Si todos los modelos de la lista fallaron por completo
+        if (!exito && tokenActual === controlTokenIA) {
+            cajaIA.innerHTML = `<span style="color: #ef4444; font-weight: 600;">⚠️ Nota del sistema: El motor de IA se encuentra temporalmente saturado o Google está rechazando las peticiones directas en este instante (${ultimoError}). Por favor intenta restablecer los filtros o recargar la página.</span>`;
+        }
+
+        if (tokenActual === controlTokenIA) {
+            pulso.style.animation = 'none';
         }
     }
 
     function procesarMarkdownAI(texto) {
         let html = texto
+            .replace(/\*\*(.*?)\*\"/g, '<strong style="color:#0f172a; font-weight:700;">$1</strong>')
             .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a; font-weight:700;">$1</strong>')
             .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li style="margin-left:15px; margin-bottom:4px;">$1</li>')
             .replace(/\n/g, '<br>');
