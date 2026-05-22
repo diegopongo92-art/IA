@@ -499,19 +499,22 @@
     function borrarApiKey() { localStorage.removeItem('gemini_api_key_mml'); alert("API Key eliminada."); cerrarModal(); }
 
     function construirPromptInicial() {
-        const dataOptimizada = currentFilteredData.slice(0, 30);
-        let textoNoticias = "DATOS:\n";
+        // Calibración intermedia: cargamos 40 notas para dar más contexto y sustancia
+        const dataOptimizada = currentFilteredData.slice(0, 40);
+        let textoNoticias = "DATOS CONTEXTUALES:\n";
         
         dataOptimizada.forEach((row, i) => {
-            let resumenCorto = row.resumen.length > 150 ? row.resumen.substring(0, 150) + "..." : row.resumen;
+            // Ampliamos el corte de caracteres a 250 para dar más riqueza a la lectura analítica
+            let resumenCorto = row.resumen.length > 250 ? row.resumen.substring(0, 250) + "..." : row.resumen;
             textoNoticias += `${i+1}. [${row.tono}] ${row.medio}: ${row.titular} | ${resumenCorto}\n`;
         });
 
-        promptInicialIA = `${textoNoticias}\n\nREGLAS ESTRICTAS DE AHORRO DE TOKENS:
-1. Omite cualquier saludo, introducción o despedida.
-2. Escribe en formato telegrama o viñetas cortas (máximo 1 línea por viñeta).
-3. LÍMITE ABSOLUTO: Tu respuesta no puede superar las 100 palabras.
-4. Ve directo al dato, conclusión o acción. No parafrasees mi pregunta.`;
+        // Prompt reajustado para permitir respuestas útiles, con formato libre pero compactas
+        promptInicialIA = `${textoNoticias}\n\nREGLAS DE OPERACIÓN (ANÁLISIS CONCISO Y EFECTIVO):
+1. Omite saludos, despedidas o comentarios introductorios repetitivos. Ve directo a responder la solicitud.
+2. No uses texto de relleno ("floro"). Ofrece sustancia política y técnica real de forma directa.
+3. Estructura tus respuestas de manera limpia usando subtítulos, viñetas o párrafos cortos según lo exija cada botón o pregunta.
+4. Desarrolla la respuesta con la longitud necesaria para que sea completamente útil y bien estructurada, pero sé lo más sintético posible.`;
     }
 
     function abrirAnalistaIA() {
@@ -538,15 +541,13 @@
     function limpiarChat(esInicio = false) {
         document.getElementById('chat-history').innerHTML = '';
         
-        // Carga interna, 0 conexión a internet, 0 tokens gastados
         chatContext = [
             { role: "user", parts: [{ text: promptInicialIA }] },
-            { role: "model", parts: [{ text: "Comprendido. Aplicaré el ahorro de tokens y seré ultra breve." }] }
+            { role: "model", parts: [{ text: "Comprendido. Analizaré con la profundidad requerida, estructurando la información sin rodeos ni textos redundantes." }] }
         ];
         
-        // Saludo local escrito directamente en la pantalla
         const mensaje = esInicio === true 
-            ? "👋 ¡Hola! Datos cargados en memoria. Selecciona un botón rápido o escribe tu consulta directa." 
+            ? "👋 ¡Hola! Datos cargados correctamente. Selecciona un botón rápido o escribe tu consulta directa." 
             : "🧹 Memoria limpia. Base de datos recargada. ¿Qué analizamos ahora?";
             
         agregarBurbuja(mensaje, "ia");
