@@ -62,7 +62,7 @@
         /* Estilos de Tabla */
         .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; min-width: 100%; table-layout: fixed; word-wrap: break-word; }
-        tr { page-break-inside: avoid; break-inside: avoid; } /* Blindaje contra cortes de filas en el PDF */
+        tr { page-break-inside: avoid; break-inside: avoid; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 11px; color: #64748b; border-bottom: 1px solid #eee; text-transform: uppercase; }
         td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 13px; line-height: 1.5; color: #0f172a; vertical-align: top; }
         
@@ -505,7 +505,7 @@
     }
 
     /* ==========================================================
-       HERRAMIENTAS COMPLEMENTARIAS (WHATSAPP & TENDENCIAS)
+       HERRAMIENTAS COMPLEMENTARIAS (WHATSAPP OPTIMIZADO & TENDENCIAS)
        ========================================================== */
 
     function copiarWhatsApp() {
@@ -517,38 +517,79 @@
         else if (currentMode === 'month') filtroActivo = "Este Mes";
         else if (currentMode === 'specific') filtroActivo = document.getElementById('filterFecha').value;
 
-        let grupos = { pos: [], neu: [], neg: [] };
+        // Estructura para almacenar filas y conjuntos únicos de medios
+        let grupos = { 
+            pos: { filas: [], medios: new Set() }, 
+            neu: { filas: [], medios: new Set() }, 
+            neg: { filas: [], medios: new Set() } 
+        };
+
         currentFilteredData.forEach(row => {
             const t = row.tono.toLowerCase();
-            if (t.includes('pos')) grupos.pos.push(row);
-            else if (t.includes('neg')) grupos.neg.push(row);
-            else grupos.neu.push(row);
+            let cat = 'neu';
+            if (t.includes('pos')) cat = 'pos';
+            else if (t.includes('neg')) cat = 'neg';
+            
+            grupos[cat].filas.push(row);
+            if (row.medio && row.medio.trim() !== "") {
+                grupos[cat].medios.add(row.medio.trim().toUpperCase());
+            }
         });
 
         let textoWA = `📋 *RESUMEN DE MEDIOS MML*\n📅 *Rango:* ${filtroActivo}\n📊 *Menciones totales:* ${currentFilteredData.length}\n\n`;
 
-        if (grupos.neg.length > 0) {
-            textoWA += `🔴 *NOTICIAS NEGATIVAS (${grupos.neg.length})*\n`;
-            grupos.neg.forEach(row => { textoWA += `• _${row.medio}_: *${row.titular}*\n`; });
-            textoWA += `\n`;
+        // Procesador de bloques compacto y anti-redundancia analógico
+        function generarBloqueCompacto(titulo, emoji, grupo) {
+            if (grupo.filas.length === 0) return "";
+            
+            let bloque = `${emoji} *${titulo} (${grupo.filas.length})*\n`;
+            let titularesMostrados = [];
+            let palabrasClaveVistas = [];
+
+            for (let row of grupo.filas) {
+                if (titularesMostrados.length >= 3) break; // Máximo 3 alertas destacadas para no saturar
+
+                // Heurística sutil: extrae palabras clave largas para identificar si la noticia ya se tocó
+                let palabrasLargas = row.titular.toLowerCase().split(/[\s,.:;()""'']+/).filter(w => w.length > 5);
+                let esRepetido = palabrasLargas.some(w => palabrasClaveVistas.includes(w));
+
+                if (!esRepetido || titularesMostrados.length === 0) {
+                    titularesMostrados.push(row.titular);
+                    palabrasClaveVistas.push(...palabrasLargas);
+                }
+            }
+
+            // Forzar enganche si el filtro fue demasiado estricto
+            if (titularesMostrados.length === 0 && grupo.filas.length > 0) {
+                for (let i = 0; i < Math.min(3, grupo.filas.length); i++) {
+                    titularesMostrados.push(grupo.filas[i].titular);
+                }
+            }
+
+            // Desplegar titulares curados
+            titularesMostrados.forEach(tit => {
+                bloque += `• ${tit}\n`;
+            });
+
+            // Compactar todos los medios en una sola hilera corrida
+            if (grupo.medios.size > 0) {
+                let stringMedios = Array.from(grupo.medios).join(", ");
+                bloque += `📢 _Medios que reportaron:_ ${stringMedios}\n`;
+            }
+
+            return bloque + "\n";
         }
-        if (grupos.neu.length > 0) {
-            textoWA += `🟡 *NOTICIAS NEUTRAS (${grupos.neu.length})*\n`;
-            grupos.neu.forEach(row => { textoWA += `• _${row.medio}_: *${row.titular}*\n`; });
-            textoWA += `\n`;
-        }
-        if (grupos.pos.length > 0) {
-            textoWA += `🟢 *NOTICIAS POSITIVAS (${grupos.pos.length})*\n`;
-            grupos.pos.forEach(row => { textoWA += `• _${row.medio}_: *${row.titular}*\n`; });
-            textoWA += `\n`;
-        }
+
+        textoWA += generarBloqueCompacto("NOTICIAS NEGATIVAS", "🔴", grupos.neg);
+        textoWA += generarBloqueCompacto("NOTICIAS NEUTRAS", "🟡", grupos.neu);
+        textoWA += generarBloqueCompacto("NOTICIAS POSITIVAS", "🟢", grupos.pos);
 
         textoWA += `_Generado automáticamente desde el Semáforo de Medios MML._`;
 
         navigator.clipboard.writeText(textoWA).then(() => {
-            alert("📋 ¡Resumen estructurado y copiado al portapapeles listo para enviar por WhatsApp!");
+            alert("📋 ¡Resumen compacto copiado! Se filtraron noticias repetidas y los medios se agruparon en una sola línea.");
         }).catch(err => {
-            alert("No se pudo copiar automáticamente: " + err);
+            alert("Error al copiar: " + err);
         });
     }
 
