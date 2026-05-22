@@ -21,7 +21,7 @@
         }
         
         * {
-            font-family: 'Inter', system-ui, sans-serif !important;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
             box-sizing: border-box;
         }
         
@@ -31,6 +31,7 @@
             color: #1e293b; 
         }
         
+        /* Encabezado */
         header { 
             background: var(--primary); 
             padding: 15px 5%; 
@@ -43,24 +44,27 @@
             z-index: 100; 
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .header-logo { height: 40px; background-color: white; padding: 5px 10px; border-radius: 6px; object-fit: contain; }
+        .header-logo { height: 40px; background-color: white; padding: 5px 10px; border-radius: 6px; object-fit: contain; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .header-credits { font-size: 11px; color: #94a3b8; margin-top: 2px; font-weight: 600; }
         
         .main { max-width: 1250px; margin: 20px auto; padding: 0 20px; }
 
+        /* Barra de Acciones */
         .actions-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
-        .btn-extra { padding: 10px 15px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; color: white; text-transform: uppercase; transition: opacity 0.2s, transform 0.1s; display: flex; align-items: center; gap: 5px; }
+        .btn-extra { padding: 10px 15px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; color: white; text-transform: uppercase; transition: opacity 0.2s, transform 0.1s; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-extra:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-extra:active { transform: translateY(1px); }
         .btn-reset { background: #64748b; }
         .btn-excel { background: #10b981; }
         .btn-pdf { background: #ef4444; }
         .btn-ia { background: #8b5cf6; } 
         .btn-whatsapp { background: #22c55e; }
 
+        /* Tarjetas de Resumen */
         .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .card { padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .card { padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; }
         .card-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; }
-        .card-value { font-size: 32px; font-weight: 800; line-height: 1; }
+        .card-value { font-size: 32px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; }
         
         .card.total { background: #ffffff; }
         .card.total .card-title { color: #475569; }
@@ -72,85 +76,117 @@
         .card.negativa { background: #fc8181; border-color: #f87171; } 
         .card.negativa .card-title, .card.negativa .card-value { color: #450a0a; }
         
+        /* Controles de Filtro */
         .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; display: grid; gap: 15px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
         label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
         select, input { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
         
         .date-controls { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
         .date-controls input[type="date"] { flex: 1; min-width: 130px; }
-        .btn-action { border: none; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; color: white; background: var(--accent); text-transform: uppercase; padding: 8px 10px; min-height: 38px; }
+        .btn-action { border: none; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; color: white; background: var(--accent); text-transform: uppercase; padding: 8px 10px; min-height: 38px; transition: opacity 0.2s; }
+        .btn-action:hover { opacity: 0.8; }
         .bg-gray { background: #64748b; }
         .bg-purple { background: #8b5cf6; }
 
+        /* Estilos de Tabla */
         .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 25px; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; word-wrap: break-word; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 13px; line-height: 1.5; vertical-align: top; }
+        table { width: 100%; border-collapse: collapse; min-width: 100%; table-layout: fixed; word-wrap: break-word; }
+        tr { page-break-inside: avoid; break-inside: avoid; }
+        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 12px; font-weight: 700; color: #64748b; border-bottom: 1px solid #eee; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #e2e8f0; font-size: 13px; line-height: 1.5; color: #0f172a; vertical-align: top; }
         
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; }
         .badge-positivo { background: #15803d; color: white; }
         .badge-negativo { background: #b91c1c; color: white; }
         .badge-neutro { background: #a16207; color: white; }
         
-        .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: block; text-align: center; text-transform: uppercase; }
+        .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; display: block; width: 100%; text-align: center; text-transform: uppercase; transition: background 0.2s; }
+        .btn-link:hover { background: #1d4ed8; }
 
+        /* Sección de Indicadores Numéricos */
         .insights-section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .insights-header { font-size: 15px; font-weight: 800; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 15px; }
         .insights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .insight-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
         .insight-box h4 { margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
         .automated-text { font-size: 13px; line-height: 1.6; color: #0f172a; font-weight: 600; }
+        .automated-text ul { margin: 5px 0 0 0; padding-left: 18px; }
 
+        /* Gráficos Estructurados */
         .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; height: 300px; display: flex; flex-direction: column; }
+        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 300px; display: flex; flex-direction: column; justify-content: space-between; }
         .chart-box h3 { font-size: 13px; font-weight: 800; color: #475569; margin: 0 0 10px 0; text-transform: uppercase; }
-        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; }
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
 
         .narratives-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; }
+        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .narrative-card.critical { border-left: 5px solid #ef4444; }
         .narrative-card.constructive { border-left: 5px solid #10b981; }
-        .narrative-card h3 { font-size: 13px; font-weight: 800; margin: 0 0 12px 0; text-transform: uppercase; }
-        .narrative-list { display: flex; flex-direction: column; gap: 8px; font-size: 13px; max-height: 250px; overflow-y: auto; }
-        .narrative-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-weight: 600; }
-        .narrative-meta { font-size: 11px; color: #64748b; font-weight: 700; margin-top: 6px; text-transform: uppercase; display: flex; justify-content: space-between; }
+        .narrative-card h3 { font-size: 13px; font-weight: 800; margin: 0 0 12px 0; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .narrative-list { display: flex; flex-direction: column; gap: 8px; font-size: 13px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .narrative-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; font-weight: 600; line-height: 1.4; }
+        .narrative-meta { font-size: 11px; color: #64748b; font-weight: 700; margin-top: 6px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
 
+        /* Reglas de Impresión para PDF perfecto */
+        @media print {
+            .charts-container { display: block !important; width: 100% !important; }
+            .chart-box { display: block !important; width: 100% !important; margin-bottom: 25px !important; height: 320px !important; page-break-inside: avoid !important; }
+            .narratives-container { display: block !important; width: 100% !important; }
+            .narrative-card { display: block !important; width: 100% !important; margin-bottom: 20px !important; page-break-inside: avoid !important; }
+            .insights-grid { display: block !important; width: 100% !important; }
+            .insight-box { display: block !important; width: 100% !important; margin-bottom: 15px !important; page-break-inside: avoid !important; }
+            .summary-cards { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+        }
+
+        /* Estructura Responsiva Móvil */
+        @media (max-width: 768px) {
+            .insights-grid, .charts-container, .narratives-container { grid-template-columns: 1fr; gap: 15px; }
+            .summary-cards { grid-template-columns: repeat(2, 1fr); }
+            .actions-bar { justify-content: center; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { display: none; }
+            .table-box { border: none; background: transparent; }
+            tr { margin-bottom: 15px; border-radius: 12px; border: 1px solid #cbd5e1; padding: 15px; display: flex; flex-wrap: wrap; gap: 10px 0; }
+            td { padding: 0; border: none; text-align: left !important; width: 100% !important; }
+            td:nth-child(1) { width: 50% !important; order: 1; font-size: 12px; }
+            td:nth-child(3) { width: 50% !important; order: 2; text-align: right !important; }
+            td:nth-child(2) { width: 100% !important; order: 3; }
+            td:nth-child(4) { width: 100% !important; order: 4; font-size: 13px; margin-top: 5px; }
+            td:nth-child(5) { width: 100% !important; order: 5; margin-top: 10px; }
+        }
+        
         /* Modal IA */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
-        .modal-content { background-color: #ffffff; padding: 25px; border-radius: 16px; width: 95%; max-width: 900px; height: 90vh; max-height: 850px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; }
-        .modal-title { font-size: 1.3rem; font-weight: 800; color: #002f80; }
+        .modal-content { background-color: #ffffff; padding: 25px; border-radius: 16px; width: 95%; max-width: 900px; height: 90vh; max-height: 850px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: fadeIn 0.3s ease; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 15px; flex-shrink: 0; }
+        .modal-title { font-size: 1.3rem; font-weight: 800; color: #002f80; display: flex; align-items: center; gap: 8px; }
         .modal-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-icon { background: #cbd5e1; color: #334155; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .btn-icon { background: #cbd5e1; color: #334155; border: none; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
         .btn-icon:hover { background: #94a3b8; color: white; }
-        .close-modal { font-size: 28px; font-weight: bold; color: #64748b; cursor: pointer; }
+        .close-modal { font-size: 28px; font-weight: bold; color: #64748b; cursor: pointer; transition: color 0.2s; line-height: 1; }
+        .close-modal:hover { color: #1e293b; }
         
-        #chat-history { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; }
+        #chat-history { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         .chat-bubble { padding: 15px; border-radius: 12px; font-size: 14px; line-height: 1.6; max-width: 90%; }
         .bubble-ia { background: #f8fafc; border: 1px solid #e2e8f0; color: #1e293b; align-self: flex-start; }
         .bubble-user { background: #8b5cf6; color: white; align-self: flex-end; font-weight: 600; }
         
-        .quick-prompts-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .btn-quick-prompt { background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-        .btn-quick-prompt:hover { background: #8b5cf6; color: white; border-color: #8b5cf6; }
+        .quick-prompts-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; flex-shrink: 0; }
+        .btn-quick-prompt { background: #e2e8f0; border: 1px solid #cbd5e1; color: #475569; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-quick-prompt:hover { background: #8b5cf6; color: white; border-color: #8b5cf6; transform: translateY(-1px); }
         
-        .chat-input-container { display: flex; gap: 10px; border-top: 2px solid #f1f5f9; padding-top: 15px; }
-        .chat-input { flex-grow: 1; padding: 14px 15px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; }
-        .btn-send-chat { background: #8b5cf6; color: white; border: none; padding: 0 25px; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .chat-input-container { display: flex; gap: 10px; border-top: 2px solid #f1f5f9; padding-top: 15px; flex-shrink: 0; }
+        .chat-input { flex-grow: 1; padding: 14px 15px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .chat-input:focus { border-color: #8b5cf6; }
+        .btn-send-chat { background: #8b5cf6; color: white; border: none; padding: 0 25px; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; transition: opacity 0.2s; }
+        .btn-send-chat:hover { opacity: 0.9; }
         .btn-send-chat:disabled { background: #cbd5e1; cursor: not-allowed; }
         
-        .loading-ia { display: flex; flex-direction: column; align-items: center; color: #8b5cf6; font-weight: 700; gap: 10px; padding: 20px; }
+        .loading-ia { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #8b5cf6; font-weight: 700; gap: 10px; text-align: center; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #8b5cf6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        @media (max-width: 768px) {
-            .insights-grid, .charts-container, .narratives-container { grid-template-columns: 1fr; }
-            .summary-cards { grid-template-columns: repeat(2, 1fr); }
-            table, thead, tbody, th, td, tr { display: block; }
-            thead tr { display: none; }
-            tr { margin-bottom: 15px; border: 1px solid #cbd5e1; padding: 15px; display: flex; flex-wrap: wrap; }
-            td { padding: 0; border: none; width: 100%; text-align: left; }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -163,7 +199,7 @@
             <div class="header-credits">Desarrollado por Diego Pongo y Mariel Ramírez</div>
         </div>
     </div>
-    <div id="data-count" style="font-size: 13px; font-weight: 700; color: #cbd5e1;">Conectando...</div>
+    <div id="data-count" style="font-size: 13px; font-weight: 700; color: #cbd5e1; text-align:right;">Conectando...</div>
 </header>
 
 <div class="main" id="dashboard-content">
@@ -177,14 +213,29 @@
     </div>
 
     <div class="summary-cards">
-        <div class="card total"><div class="card-title"># Menciones</div><div class="card-value"><span id="count-total">0</span></div></div>
-        <div class="card positiva"><div class="card-title"># Positivas</div><div class="card-value"><span id="count-pos">0</span></div></div>
-        <div class="card neutra"><div class="card-title"># Neutras</div><div class="card-value"><span id="count-neu">0</span></div></div>
-        <div class="card negativa"><div class="card-title"># Negativas</div><div class="card-value"><span id="count-neg">0</span></div></div>
+        <div class="card total">
+            <div class="card-title"># Menciones</div>
+            <div class="card-value"><span id="count-total">0</span></div>
+        </div>
+        <div class="card positiva">
+            <div class="card-title"># Positivas</div>
+            <div class="card-value"><span id="count-pos">0</span></div>
+        </div>
+        <div class="card neutra">
+            <div class="card-title"># Neutras</div>
+            <div class="card-value"><span id="count-neu">0</span></div>
+        </div>
+        <div class="card negativa">
+            <div class="card-title"># Negativas</div>
+            <div class="card-value"><span id="count-neg">0</span></div>
+        </div>
     </div>
 
     <div class="controls" data-html2canvas-ignore="true">
-        <div><label>Buscar</label><input type="text" id="search" placeholder="Ej. Alcalde..." onkeyup="runFilters()"></div>
+        <div>
+            <label>Buscar (Titular o Resumen)</label>
+            <input type="text" id="search" placeholder="Ej. Alcalde, Obras..." onkeyup="runFilters()">
+        </div>
         <div>
             <label>Fecha</label>
             <div class="date-controls">
@@ -194,41 +245,98 @@
                 <input type="date" id="filterFecha" onchange="onFechaChange()">
             </div>
         </div>
-        <div><label>Hora (Desde)</label><input type="time" id="filterHora" oninput="runFilters()"></div>
-        <div><label>Tema</label><select id="filterEtiqueta" onchange="runFilters()"><option value="">Todas</option></select></div>
-        <div><label>Tono</label><select id="filterTono" onchange="runFilters()"><option value="">Todos</option></select></div>
-        <div><label>Medio</label><select id="filterTipoMedio" onchange="runFilters()"><option value="">Todos</option></select></div>
+        <div>
+            <label>Hora de Registro (Desde)</label>
+            <input type="time" id="filterHora" oninput="runFilters()">
+        </div>
+        <div>
+            <label>Etiqueta / Tema</label>
+            <select id="filterEtiqueta" onchange="runFilters()">
+                <option value="">Todas</option>
+            </select>
+        </div>
+        <div>
+            <label>Tono</label>
+            <select id="filterTono" onchange="runFilters()">
+                <option value="">Todos</option>
+            </select>
+        </div>
+        <div>
+            <label>Tipo de Medio</label>
+            <select id="filterTipoMedio" onchange="changeFilterTipoMedio()">
+                <option value="">Todos</option>
+            </select>
+        </div>
     </div>
 
     <div class="table-box">
         <table>
-            <thead><tr><th style="width: 12%;">Fecha</th><th style="width: 25%;">Titular / Medio</th><th style="width: 10%;">Tono</th><th style="width: 43%;">Resumen</th><th style="width: 10%;">Enlace</th></tr></thead>
-            <tbody id="table-body"><tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b;">Sincronizando datos...</td></tr></tbody>
+            <thead>
+                <tr>
+                    <th style="width: 12%;">Fecha</th>
+                    <th style="width: 25%;">Titular / Medio</th>
+                    <th style="width: 10%;">Tono</th>
+                    <th style="width: 43%;">Resumen</th>
+                    <th style="width: 10%;">Enlace</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b; font-weight:bold;">Sincronizando datos, un momento...</td></tr>
+            </tbody>
         </table>
     </div>
 
     <div id="btn-ayer-container" style="text-align: center; margin-top: 15px; margin-bottom: 25px; display: none;" data-html2canvas-ignore="true">
         <button id="btn-ayer" class="btn-action bg-gray" style="padding: 10px 20px; font-size: 12px; border-radius: 8px;" onclick="toggleAyer()">
-            ➖ Ocultar rezagos de ayer
+            ➖ Ocultar notas de ayer
         </button>
     </div>
 
     <div class="charts-container">
-        <div class="chart-box"><h3>📈 Línea de Tiempo (Últimos 5 días)</h3><div class="chart-wrapper"><canvas id="timelineChart"></canvas></div></div>
-        <div class="chart-box"><h3>📊 Balance / Share of Voice</h3><div class="chart-wrapper"><canvas id="pieChart"></canvas></div></div>
+        <div class="chart-box">
+            <h3>📈 Línea de Tiempo: Evolución Dinámica (Últimos 5 días)</h3>
+            <div class="chart-wrapper">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3>📊 Balance / Share of Voice</h3>
+            <div class="chart-wrapper">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <div class="insights-section">
-        <div class="insights-header">📋 Indicadores de Cobertura</div>
+        <div class="insights-header">📋 Indicadores de Cobertura Activa</div>
         <div class="insights-grid">
-            <div class="insight-box"><h4>📈 Distribución de Tono</h4><div id="analytics-tonos" class="automated-text">Calculando...</div></div>
-            <div class="insight-box"><h4>🏷️ Volumen por Tema</h4><div id="analytics-temas" class="automated-text">Extrayendo...</div></div>
-            <div class="insight-box"><h4>🚨 Foco de Alertas Críticas</h4><div id="analytics-canales" class="automated-text">Identificando...</div></div>
+            <div class="insight-box">
+                <h4>📈 Distribución de Tono</h4>
+                <div id="analytics-tonos" class="automated-text">Calculando porcentajes...</div>
+            </div>
+            <div class="insight-box">
+                <h4>🏷️ Volumen por Tema Principal</h4>
+                <div id="analytics-temas" class="automated-text">Extrayendo volumen por tema...</div>
+            </div>
+            <div class="insight-box">
+                <h4>🚨 Foco de Alertas Críticas (Data Adversa)</h4>
+                <div id="analytics-canales" class="automated-text">Identificando canales y alertas críticas...</div>
+            </div>
         </div>
 
         <div class="narratives-container">
-            <div class="narrative-card critical"><h3 style="color: #b91c1c;">🔴 Focos Críticos</h3><div id="critical-narratives-list" class="narrative-list"></div></div>
-            <div class="narrative-card constructive"><h3 style="color: #0f5132;">🟢 Focos Constructivos</h3><div id="positive-narratives-list" class="narrative-list"></div></div>
+            <div class="narrative-card critical">
+                <h3 style="color: #b91c1c;">🔴 Focos Críticos de la Jornada (Notas Adversas)</h3>
+                <div id="critical-narratives-list" class="narrative-list">
+                    <div style="color: #64748b; font-size: 12px;">No se registran menciones críticas.</div>
+                </div>
+            </div>
+            <div class="narrative-card constructive">
+                <h3 style="color: #0f5132;">🟢 Focos Constructivos de la Jornada (Notas Favorables)</h3>
+                <div id="positive-narratives-list" class="narrative-list">
+                    <div style="color: #64748b; font-size: 12px;">No se registran menciones positivas.</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -245,12 +353,12 @@
         </div>
         <div id="chat-history"></div>
         <div class="quick-prompts-container">
-            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🚨 Alerta de Crisis', 'Analiza estrictamente las noticias negativas o neutras de mis datos actuales para detectar posibles riesgos reputacionales y sugiere 3 acciones de contención.')">🚨 Alerta de Crisis</button>
-            <button class="btn-quick-prompt" onclick="enviarPromptRapido('📱 Creador Redes', 'Propón 2 hilos de Twitter y 1 post de Facebook basados EXCLUSIVAMENTE en las noticias positivas. Usa un tono cercano institucional.')">📱 Creador Redes</button>
-            <button class="btn-quick-prompt" onclick="enviarPromptRapido('👔 Resumen Alcaldía', 'Redacta un resumen ejecutivo de máximo 3 párrafos dirigido al Alcalde con el balance general y recomendación del día.')">👔 Resumen Alcaldía</button>
-            <button class="btn-quick-prompt" onclick="enviarPromptRapido('📊 Análisis Tono', 'Desglose detallado del sentimiento de las noticias, explicando las razones detrás de las menciones negativas y positivas.')">📊 Análisis Tono</button>
-            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🎯 Mapeo Actores', 'Identifica a los principales actores, políticos o instituciones mencionados hoy y cuál es su postura frente a la MML.')">🎯 Mapeo Actores</button>
-            <button class="btn-quick-prompt" onclick="enviarPromptRapido('💡 Titulares Prensa', 'Basado en los datos de hoy, redacta 3 opciones de titulares atractivos para un comunicado de prensa oficial de la MML.')">💡 Titulares Prensa</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🚨 Alerta de Crisis', 'Analiza estrictamente las noticias negativas o neutras de mis datos actuales para detectar posibles riesgos reputacionales, identificando a los actores involucrados y sugiriendo 3 acciones de contención.')">🚨 Alerta de Crisis</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('📱 Creador de Redes', 'Propón 2 hilos de Twitter y 1 post de Facebook basados EXCLUSIVAMENTE en las noticias positivas de mis datos actuales. Usa un tono cercano, institucional y usa emojis.')">📱 Creador Redes</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('👔 Resumen Ejecutivo', 'Redacta un resumen ejecutivo de máximo 3 párrafos dirigido al Alcalde. Destaca el balance general, el tema más comentado y la recomendación principal del día basándote en los datos.')">👔 Resumen Alcaldía</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('📊 Análisis Tono', 'Proporciona un desglose detallado del sentimiento de las noticias de hoy, explicando las razones detrás de las menciones negativas y positivas de los datos actuales.')">📊 Análisis Tono</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('🎯 Mapeo de Actores', 'Identifica a los principales actores, políticos, voceros o instituciones mencionados hoy en mis datos y resume cuál es su postura frente a la gestión.')">🎯 Mapeo Actores</button>
+            <button class="btn-quick-prompt" onclick="enviarPromptRapido('💡 Sugerencia Titulares', 'Basado en los datos favorables de hoy, redacta 3 opciones de titulares atractivos para un comunicado de prensa oficial.')">💡 Titulares Prensa</button>
         </div>
         <div class="chat-input-container">
             <input type="text" id="userInput" class="chat-input" placeholder="Hazle una pregunta a tus datos..." onkeypress="handleEnter(event)">
@@ -261,8 +369,10 @@
 
 <script>
     Chart.register(ChartDataLabels);
+
     const csv_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2khLH7C3lCFCIV3ss1U5AV4SOL922Sld2rnPhSayp39VqgtlBV8ey63dxgCbur1nHiK-6CfNKB2B-/pub?gid=817460174&single=true&output=csv';
-    let allData = [], currentFilteredData = [];
+    let allData = [];
+    let currentFilteredData = [];
     
     const hoyDate = new Date();
     const hoyTime = new Date(hoyDate.getFullYear(), hoyDate.getMonth(), hoyDate.getDate()).getTime();
@@ -272,11 +382,13 @@
     let mostrarAyer = true; 
     let timelineChartInstance = null;
     let pieChartInstance = null;
+    let chatContext = [];
 
     async function init() {
         try {
             const cacheBusterUrl = csv_url + '&t=' + new Date().getTime();
             const response = await fetch(cacheBusterUrl);
+            if (!response.ok) throw new Error("Error de conexión.");
             const csvText = await response.text();
             Papa.parse(csvText, {
                 header: true, skipEmptyLines: 'greedy', 
@@ -309,28 +421,26 @@
                     generateStaticFilters(allData);
                     const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
                     document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
-                    
-                    // Al cargar iniciamos en HOY con mostrarAyer en TRUE (rezagos)
-                    currentMode = 'hoy';
-                    mostrarAyer = true;
                     runFilters();
                 }
             });
-        } catch (error) { document.getElementById('table-body').innerHTML = `<tr><td colspan="5">Error: ${error.message}</td></tr>`; }
+        } catch (error) { document.getElementById('table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; color:#b91c1c;">Error: ${error.message}</td></tr>`; }
     }
 
     function generateStaticFilters(data) {
         const tonos = [...new Set(data.map(row => row.tono).filter(t => t !== ""))].sort();
         const tiposMedio = [...new Set(data.map(row => row.tipoMedio).filter(m => m !== ""))].sort();
-        tonos.forEach(t => document.getElementById('filterTono').appendChild(new Option(t, t)));
-        tiposMedio.forEach(t => document.getElementById('filterTipoMedio').appendChild(new Option(t, t)));
+        const selectTono = document.getElementById('filterTono');
+        const selectTipoMedio = document.getElementById('filterTipoMedio');
+        tonos.forEach(t => { selectTono.appendChild(new Option(t, t)); });
+        tiposMedio.forEach(t => { selectTipoMedio.appendChild(new Option(t, t)); });
     }
 
     function setSoloHoy() {
         const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
         document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
         document.getElementById('filterHora').value = '';
-        currentMode = 'hoy'; mostrarAyer = true; runFilters(); // Regresa a estado original (Hoy + Rezagos)
+        currentMode = 'hoy'; mostrarAyer = true; runFilters(); // Regresa al estado natural: Hoy + Rezagos
     }
     function setAyerYHoy() { document.getElementById('filterFecha').value = ''; document.getElementById('filterHora').value = ''; currentMode = 'rango_ayer_hoy'; mostrarAyer = false; runFilters(); }
     function verMes() { document.getElementById('filterFecha').value = ''; document.getElementById('filterHora').value = ''; currentMode = 'month'; mostrarAyer = false; runFilters(); }
@@ -341,21 +451,47 @@
         runFilters();
     }
     function toggleAyer() { mostrarAyer = !mostrarAyer; runFilters(); }
+    function changeFilterTipoMedio() { runFilters(); }
     
-    function resetFilters() { setSoloHoy(); document.getElementById('search').value = ''; document.getElementById('filterEtiqueta').value = ''; document.getElementById('filterTono').value = ''; document.getElementById('filterTipoMedio').value = ''; runFilters(); }
+    function resetFilters() {
+        const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
+        document.getElementById('search').value = ''; document.getElementById('filterFecha').value = `${y}-${m}-${d}`; document.getElementById('filterHora').value = '';
+        document.getElementById('filterEtiqueta').value = ''; document.getElementById('filterTono').value = ''; document.getElementById('filterTipoMedio').value = '';
+        currentMode = 'hoy'; mostrarAyer = true; runFilters();
+    }
 
     function downloadExcel() {
-        if (!currentFilteredData.length) return alert("Sin datos.");
-        const blob = new Blob(['\uFEFF' + Papa.unparse(currentFilteredData)], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Semaforo_MML.csv"; link.click();
+        if (currentFilteredData.length === 0) return alert("No hay datos para descargar.");
+        const dataParaExcel = currentFilteredData.map(row => ({
+            'Fecha Registro': row.marcaTemporal, 'Fecha Noticia': row.fecha, 'Titular': row.titular, 'Medio': row.medio,
+            'Tipo de Medio': row.tipoMedio, 'Tono': row.tono, 'Resumen': row.resumen, 'Etiqueta': row.etiqueta, 'Enlace': row.link
+        }));
+        const csvString = Papa.unparse(dataParaExcel);
+        const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", "Semaforo_MML.csv");
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
+    // Exportación PDF adaptada a Layout Vertical
     function downloadPDF() {
-        const btnAyer = document.getElementById('btn-ayer-container'); if(btnAyer) btnAyer.style.display = 'none'; 
-        html2pdf().set({ margin: 0.3, filename: 'Semaforo_MML.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(document.getElementById('dashboard-content')).save().then(() => { if(currentMode === 'hoy' && btnAyer) btnAyer.style.display = 'block'; });
+        const elemento = document.getElementById('dashboard-content');
+        const btnAyer = document.getElementById('btn-ayer-container');
+        if(btnAyer) btnAyer.style.display = 'none'; 
+        
+        const opciones = { 
+            margin: [0.4, 0.4, 0.4, 0.4], 
+            filename: 'Semaforo_MML.pdf', 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2, useCORS: true }, 
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+        };
+        
+        html2pdf().set(opciones).from(elemento).save().then(() => { if(currentMode === 'hoy' && btnAyer) btnAyer.style.display = 'block'; });
     }
 
-    // --- Lógica de Fecha Super Robusta ---
+    // LÓGICA DE FECHAS CORREGIDA Y ROBUSTA
     function parseExcelDate(dateStr) {
         if (!dateStr) return null;
         const datePart = dateStr.split(' ')[0].trim();
@@ -363,7 +499,6 @@
         if(parts.length < 3) return null;
         
         let d = parseInt(parts[0], 10), m = parseInt(parts[1], 10) - 1, y = parseInt(parts[2], 10);
-        // Si el mes es mayor a 11 (es decir 12 o más), significa que el sistema lo leyó como MM/DD/YYYY, lo volteamos.
         if (m > 11) { let temp = d; d = m + 1; m = temp - 1; }
         if (y < 100) y += 2000;
         return new Date(y, m, d).getTime();
@@ -383,17 +518,19 @@
     }
 
     function updateDynamicEtiquetas(dataParaEsaFecha, etiquetaActual) {
-        const sel = document.getElementById('filterEtiqueta');
-        const etiquetas = [...new Set(dataParaEsaFecha.map(r => r.etiqueta).filter(e => e !== ""))].sort();
-        sel.innerHTML = '<option value="">Todas</option>';
-        etiquetas.forEach(e => sel.appendChild(new Option(e, e)));
-        if (etiquetas.includes(etiquetaActual)) sel.value = etiquetaActual;
+        const selectEtiqueta = document.getElementById('filterEtiqueta');
+        const etiquetasDisponibles = [...new Set(dataParaEsaFecha.map(row => row.etiqueta).filter(e => e !== ""))].sort();
+        selectEtiqueta.innerHTML = '<option value="">Todas las etiquetas</option>';
+        etiquetasDisponibles.forEach(e => { selectEtiqueta.appendChild(new Option(e, e)); });
+        if (etiquetasDisponibles.includes(etiquetaActual)) { selectEtiqueta.value = etiquetaActual; }
     }
 
     function runFilters() {
         const search = document.getElementById('search').value.toLowerCase(), tono = document.getElementById('filterTono').value, tipoMedio = document.getElementById('filterTipoMedio').value;
         const fechaInput = document.getElementById('filterFecha').value, horaInput = document.getElementById('filterHora').value, etiquetaPrevia = document.getElementById('filterEtiqueta').value;
-        let minMinutes = horaInput ? (parseInt(horaInput.split(':')[0], 10) * 60 + parseInt(horaInput.split(':')[1], 10)) : -1;
+
+        let minMinutes = -1;
+        if (horaInput) { const [hInput, mInput] = horaInput.split(':'); minMinutes = parseInt(hInput, 10) * 60 + parseInt(mInput, 10); }
 
         const btnAyerContainer = document.getElementById('btn-ayer-container'), btnAyer = document.getElementById('btn-ayer');
         if (currentMode === 'hoy') { 
@@ -406,17 +543,19 @@
         const dateFiltered = allData.filter(row => {
             const rowTime = parseExcelDate(row.fecha); 
             if (!rowTime) return true;
+            const rY = new Date(rowTime).getFullYear(), rM = new Date(rowTime).getMonth();
             if (currentMode === 'hoy') {
                 if (rowTime === hoyTime) return true; 
-                // LÓGICA DE REZAGOS RESTAURADA: Si publicaron ayer pero se registró (marca temporal) HOY
-                if (mostrarAyer && rowTime === ayerTime) { 
-                    if (parseExcelDate(row.marcaTemporal) === hoyTime) return true; 
-                }
+                // LÓGICA DE REZAGOS
+                if (mostrarAyer && rowTime === ayerTime) { if (parseExcelDate(row.marcaTemporal) === hoyTime) return true; }
                 return false;
             } 
-            else if (currentMode === 'rango_ayer_hoy') return (rowTime === ayerTime || rowTime === hoyTime);
-            else if (currentMode === 'specific' && fechaInput) return (rowTime === new Date(parseInt(fechaInput.split('-')[0]), parseInt(fechaInput.split('-')[1])-1, parseInt(fechaInput.split('-')[2])).getTime());
-            else if (currentMode === 'month') return (new Date(rowTime).getFullYear() === hoyDate.getFullYear() && new Date(rowTime).getMonth() === hoyDate.getMonth());
+            else if (currentMode === 'rango_ayer_hoy') { return (rowTime === ayerTime || rowTime === hoyTime); }
+            else if (currentMode === 'specific' && fechaInput) {
+                const [yInput, mInput, dInput] = fechaInput.split('-');
+                return (rowTime === new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime());
+            } 
+            else if (currentMode === 'month') { return (rY === hoyDate.getFullYear() && rM === hoyDate.getMonth()); }
             return true; 
         });
 
@@ -425,99 +564,320 @@
 
         currentFilteredData = dateFiltered.filter(row => {
             const matchSearch = search === "" || (row.titular + " " + row.resumen).toLowerCase().includes(search);
-            const matchHora = minMinutes === -1 || (getMinutesFromMarcaTemporal(row.marcaTemporal) >= minMinutes);
-            return matchSearch && (tono === "" || row.tono === tono) && (tipoMedio === "" || row.tipoMedio === tipoMedio) && (etiquetaActual === "" || row.etiqueta === etiquetaActual) && matchHora;
+            const matchTono = tono === "" || row.tono === tono;
+            const matchTipoMedio = tipoMedio === "" || row.tipoMedio === tipoMedio;
+            const matchEtiqueta = etiquetaActual === "" || row.etiqueta === etiquetaActual;
+            let matchHora = true;
+            if (minMinutes >= 0) {
+                const rowMins = getMinutesFromMarcaTemporal(row.marcaTemporal);
+                if (rowMins !== -1 && rowMins < minMinutes) matchHora = false;
+            }
+            return matchSearch && matchTono && matchTipoMedio && matchEtiqueta && matchHora;
         });
 
-        let pos = 0, neu = 0, neg = 0;
-        currentFilteredData.forEach(r => { const t = r.tono.toLowerCase(); if (t.includes('pos')) pos++; else if (t.includes('neg')) neg++; else neu++; });
-        
+        let countPos = 0, countNeu = 0, countNeg = 0;
+        currentFilteredData.forEach(row => {
+            const tLow = row.tono.toLowerCase();
+            if (tLow.includes('pos')) countPos++; else if (tLow.includes('neg')) countNeg++; else countNeu++;
+        });
         document.getElementById('count-total').innerText = currentFilteredData.length;
-        document.getElementById('count-pos').innerText = pos; document.getElementById('count-neu').innerText = neu; document.getElementById('count-neg').innerText = neg;
+        document.getElementById('count-pos').innerText = countPos;
+        document.getElementById('count-neu').innerText = countNeu;
+        document.getElementById('count-neg').innerText = countNeg;
         
-        generarAuditoriaNumericaObjetiva(currentFilteredData, pos, neu, neg); renderizarGraficosYFocos(currentFilteredData, pos, neu, neg); renderTable(currentFilteredData);
+        generarAuditoriaNumericaObjetiva(currentFilteredData, countPos, countNeu, countNeg);
+        renderizarGraficosYFocos(currentFilteredData, countPos, countNeu, countNeg);
+        renderTable(currentFilteredData);
     }
 
     function generarAuditoriaNumericaObjetiva(data, pos, neu, neg) {
-        const tTonos = document.getElementById('analytics-tonos'), tTemas = document.getElementById('analytics-temas'), tCanales = document.getElementById('analytics-canales');
-        if (!data.length) { tTonos.innerHTML = "Sin data."; tTemas.innerHTML = "Sin data."; tCanales.innerHTML = "Sin alertas."; return; }
-        tTonos.innerHTML = `• <b>Positivas:</b> ${pos} (${((pos/data.length)*100).toFixed(1)}%)<br>• <b>Neutras:</b> ${neu} (${((neu/data.length)*100).toFixed(1)}%)<br>• <b>Negativas:</b> ${neg} (${((neg/data.length)*100).toFixed(1)}%)`;
+        const tTonos = document.getElementById('analytics-tonos');
+        const tTemas = document.getElementById('analytics-temas');
+        const tCanales = document.getElementById('analytics-canales');
+        if (data.length === 0) {
+            tTonos.innerHTML = "Sin data en este corte."; tTemas.innerHTML = "Sin data en este corte."; tCanales.innerHTML = "Sin alertas en este corte.";
+            return;
+        }
+        const total = data.length;
+        tTonos.innerHTML = `• <b>Positivas:</b> ${pos} (${((pos/total)*100).toFixed(1)}%)<br>` +
+                           `• <b>Neutras:</b> ${neu} (${((neu/total)*100).toFixed(1)}%)<br>` +
+                           `• <b>Negativas:</b> ${neg} (${((neg/total)*100).toFixed(1)}%)`;
 
-        let mapas = {}; data.forEach(r => { if(r.etiqueta) mapas[r.etiqueta] = (mapas[r.etiqueta] || 0) + 1; });
-        let ord = Object.keys(mapas).map(k => ({tema: k, qty: mapas[k]})).sort((a,b) => b.qty - a.qty);
-        tTemas.innerHTML = ord.length ? "<ul>" + ord.slice(0, 3).map(t => `<li><b>${t.tema}:</b> ${t.qty} notas</li>`).join('') + "</ul>" : "Sin etiquetas.";
+        let mapaEtiquetas = {};
+        data.forEach(r => { if(r.etiqueta) mapaEtiquetas[r.etiqueta] = (mapaEtiquetas[r.etiqueta] || 0) + 1; });
+        let temasOrdenados = Object.keys(mapaEtiquetas).map(key => ({tema: key, qty: mapaEtiquetas[key]})).sort((a,b) => b.qty - a.qty);
 
-        let mediosNeg = {}; let totalNeg = 0; data.forEach(r => { if(r.tono.toLowerCase().includes('neg')) { totalNeg++; mediosNeg[r.medio] = (mediosNeg[r.medio] || 0) + 1; } });
-        let maxM = "Ninguno", maxN = 0; for (let m in mediosNeg) { if(mediosNeg[m] > maxN) { maxN = mediosNeg[m]; maxM = m; } }
-        tCanales.innerHTML = totalNeg > 0 ? `• <b>Alertas:</b> ${totalNeg}<br>• <b>Foco Crítico:</b> ${maxM} (${maxN})` : `<span style="color:#16a34a; font-weight:700;">🟢 Cero alertas críticas.</span>`;
+        if(temasOrdenados.length > 0) {
+            let htmlTemas = "<ul>";
+            temasOrdenados.slice(0, 3).forEach(t => { htmlTemas += `<li><b>${t.tema}:</b> ${t.qty} notas</li>`; });
+            tTemas.innerHTML = htmlTemas + "</ul>";
+        } else { tTemas.innerHTML = "Sin etiquetas en el filtro actual."; }
+
+        let mapaMediosNegativos = {}; let totalNotasCriticas = 0;
+        data.forEach(r => {
+            if(r.tono.toLowerCase().includes('neg')) {
+                totalNotasCriticas++;
+                if(r.medio) mapaMediosNegativos[r.medio] = (mapaMediosNegativos[r.medio] || 0) + 1;
+            }
+        });
+
+        let medioMasCritico = "Ninguno", maxNeg = 0;
+        for (let m in mapaMediosNegativos) { if(mapaMediosNegativos[m] > maxNeg) { maxNeg = mapaMediosNegativos[m]; medioMasCritico = m; } }
+
+        if (totalNotasCriticas > 0) {
+            tCanales.innerHTML = `• <b>Total Alertas Adversas:</b> ${totalNotasCriticas} notas<br>` +
+                                 `• <b>Foco Crítico Principal:</b> ${medioMasCritico} (${maxNeg} notas negativas)`;
+        } else {
+            tCanales.innerHTML = `<span style="color:#16a34a; font-weight:700;">🟢 Cero alertas críticas bajo los filtros aplicados.</span>`;
+        }
     }
 
     function renderizarGraficosYFocos(data, pos, neu, neg) {
-        const lc = document.getElementById('critical-narratives-list'), lp = document.getElementById('positive-narratives-list');
-        lc.innerHTML = data.filter(r => r.tono.toLowerCase().includes('neg')).slice(0, 4).map(r => `<div class="narrative-item"><div>${r.titular}</div><div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver ↗</a></div></div>`).join('') || `<div style="padding:10px;">Sin notas adversas.</div>`;
-        lp.innerHTML = data.filter(r => r.tono.toLowerCase().includes('pos')).slice(0, 4).map(r => `<div class="narrative-item"><div>${r.titular}</div><div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver ↗</a></div></div>`).join('') || `<div style="padding:10px;">Sin notas favorables.</div>`;
+        const listaCriticas = document.getElementById('critical-narratives-list');
+        const listaPositivas = document.getElementById('positive-narratives-list');
+        
+        let notasNegativas = data.filter(r => r.tono.toLowerCase().includes('neg')).slice(0, 4);
+        let notasPositivas = data.filter(r => r.tono.toLowerCase().includes('pos')).slice(0, 4);
+
+        if(notasNegativas.length > 0) {
+            listaCriticas.innerHTML = '';
+            notasNegativas.forEach(r => {
+                listaCriticas.innerHTML += `<div class="narrative-item">` +
+                    `<div>${r.titular}</div>` +
+                    `<div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver nota ↗</a></div>` +
+                `</div>`;
+            });
+        } else { listaCriticas.innerHTML = `<div style="color: #64748b; font-size: 12px; padding:10px;">No se registran notas adversas.</div>`; }
+
+        if(notasPositivas.length > 0) {
+            listaPositivas.innerHTML = '';
+            notasPositivas.forEach(r => {
+                listaPositivas.innerHTML += `<div class="narrative-item">` +
+                    `<div>${r.titular}</div>` +
+                    `<div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver nota ↗</a></div>` +
+                `</div>`;
+            });
+        } else { listaPositivas.innerHTML = `<div style="color: #64748b; font-size: 12px; padding:10px;">No se registran notas favorables.</div>`; }
 
         if(pieChartInstance) pieChartInstance.destroy();
-        pieChartInstance = new Chart(document.getElementById('pieChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Positivas', 'Neutras', 'Negativas'], datasets: [{ data: [pos, neu, neg], backgroundColor: ['#86efac', '#fde047', '#fc8181'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: true, formatter: (v, ctx) => v > 0 ? ((v / ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0))*100).toFixed(0) + '%' : '' } } } });
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const totalVotos = pos + neu + neg;
 
-        let baseTime = document.getElementById('filterFecha').value ? new Date(parseInt(document.getElementById('filterFecha').value.split('-')[0]), parseInt(document.getElementById('filterFecha').value.split('-')[1])-1, parseInt(document.getElementById('filterFecha').value.split('-')[2])).getTime() : hoyTime;
-        let ult5 = [4,3,2,1,0].map(i => baseTime - (i * 86400000));
-        let labels5 = ult5.map(ts => ts === hoyTime ? 'HOY' : `${String(new Date(ts).getDate()).padStart(2,'0')}/${String(new Date(ts).getMonth()+1).padStart(2,'0')}`);
-        let cont = {}; ult5.forEach(ts => cont[ts] = {pos:0, neu:0, neg:0});
-        
-        allData.forEach(r => {
-            let t = parseExcelDate(r.fecha);
-            if (t && cont[t]) { if(r.tono.toLowerCase().includes('pos')) cont[t].pos++; else if(r.tono.toLowerCase().includes('neg')) cont[t].neg++; else cont[t].neu++; }
+        pieChartInstance = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Positivas', 'Neutras', 'Negativas'],
+                datasets: [{
+                    data: [pos, neu, neg],
+                    backgroundColor: ['#86efac', '#fde047', '#fc8181'],
+                    borderColor: ['#4ade80', '#facc15', '#f87171'],
+                    borderWidth: 1
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { 
+                    legend: { position: 'right', labels: { boxWidth: 10, font: { family: 'Inter', size: 10, weight: 'bold' } } },
+                    datalabels: {
+                        display: true,
+                        color: '#000000',
+                        font: { family: 'Inter', weight: 'bold', size: 11 },
+                        formatter: (value) => {
+                            if (value === 0 || totalVotos === 0) return '';
+                            let pct = ((value / totalVotos) * 100).toFixed(0) + '%';
+                            return `${value}\n(${pct})`;
+                        },
+                        textAlign: 'center'
+                    }
+                } 
+            }
         });
 
+        const fechaInputVal = document.getElementById('filterFecha').value;
+        let baseTime = hoyTime;
+        if (fechaInputVal) { const [yInput, mInput, dInput] = fechaInputVal.split('-'); baseTime = new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime(); }
+
+        let ultimos5DiasCompletos = [];
+        for (let i = 4; i >= 0; i--) { ultimos5DiasCompletos.push(baseTime - (i * 24 * 60 * 60 * 1000)); }
+        let labels5Dias = ultimos5DiasCompletos.map(ts => { const d = new Date(ts); return ts === hoyTime ? `HOY` : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`; });
+
+        let mapaConteos5Dias = {}; ultimos5DiasCompletos.forEach(ts => { mapaConteos5Dias[ts] = { pos: 0, neu: 0, neg: 0 }; });
+        const search = document.getElementById('search').value.toLowerCase(), tonoFilter = document.getElementById('filterTono').value, tipoMedio = document.getElementById('filterTipoMedio').value, etiquetaActual = document.getElementById('filterEtiqueta').value;
+
+        allData.forEach(row => {
+            const rowTime = parseExcelDate(row.fecha);
+            if (rowTime && mapaConteos5Dias.hasOwnProperty(rowTime)) {
+                if ((search === "" || (row.titular + " " + row.resumen).toLowerCase().includes(search)) && (tonoFilter === "" || row.tono === tonoFilter) && (tipoMedio === "" || row.tipoMedio === tipoMedio) && (etiquetaActual === "" || row.etiqueta === etiquetaActual)) {
+                    const t = row.tono.toLowerCase(); if(t.includes('pos')) mapaConteos5Dias[rowTime].pos++; else if(t.includes('neg')) mapaConteos5Dias[rowTime].neg++; else mapaConteos5Dias[rowTime].neu++;
+                }
+            }
+        });
+
+        let dataLinePos = [], dataLineNeu = [], dataLineNeg = [];
+        ultimos5DiasCompletos.forEach(ts => { dataLinePos.push(mapaConteos5Dias[ts].pos); dataLineNeu.push(mapaConteos5Dias[ts].neu); dataLineNeg.push(mapaConteos5Dias[ts].neg); });
+
         if(timelineChartInstance) timelineChartInstance.destroy();
-        timelineChartInstance = new Chart(document.getElementById('timelineChart').getContext('2d'), { type: 'line', data: { labels: labels5, datasets: [{ label: 'Positivas', data: ult5.map(ts=>cont[ts].pos), borderColor: '#15803d' }, { label: 'Neutras', data: ult5.map(ts=>cont[ts].neu), borderColor: '#a16207' }, { label: 'Negativas', data: ult5.map(ts=>cont[ts].neg), borderColor: '#b91c1c' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { display: false } } } });
+        const ctxLine = document.getElementById('timelineChart').getContext('2d');
+        timelineChartInstance = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: labels5Dias,
+                datasets: [
+                    { label: 'Positivas', data: dataLinePos, borderColor: '#15803d', backgroundColor: '#86efac', tension: 0.15 },
+                    { label: 'Neutras', data: dataLineNeu, borderColor: '#a16207', backgroundColor: '#fde047', tension: 0.15 },
+                    { label: 'Negativas', data: dataLineNeg, borderColor: '#b91c1c', backgroundColor: '#fc8181', tension: 0.15 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { 
+                    y: { beginAtZero: true, ticks: { font: { family: 'Inter' }, stepSize: 1 } }, 
+                    x: { ticks: { font: { family: 'Inter', weight: (context) => context.tick && context.tick.label && context.tick.label.includes('HOY') ? 'bold' : 'normal' } } } 
+                },
+                plugins: { 
+                    legend: { position: 'top', labels: { font: { family: 'Inter' } } },
+                    datalabels: { display: false }
+                }
+            }
+        });
     }
 
     function renderTable(data) {
         const tbody = document.getElementById('table-body');
-        if (!data.length) return tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay noticias.</td></tr>`;
-        tbody.innerHTML = data.slice(0, 300).map(row => {
+        tbody.innerHTML = '';
+        const displayData = data.slice(0, 300);
+        
+        let textoConteo = currentMode === 'hoy' ? (mostrarAyer ? "Hoy + Rezagos de ayer" : "Solo Hoy") : currentMode === 'rango_ayer_hoy' ? "Ayer y Hoy" : currentMode === 'specific' ? "Fecha Seleccionada" : "Este Mes";
+        document.getElementById('data-count').innerText = `Mostrando: ${textoConteo}`;
+        
+        if (displayData.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:50px; color:#64748b; border:none;">No hay noticias bajo el criterio actual.</td></tr>`; return; }
+
+        displayData.forEach(row => {
             const tLow = row.tono.toLowerCase();
-            let bc = tLow.includes('pos') ? 'badge-positivo' : (tLow.includes('neg') ? 'badge-negativo' : 'badge-neutro');
-            let rs = tLow.includes('pos') ? 'background-color: #86efac;' : (tLow.includes('neg') ? 'background-color: #fc8181;' : 'background-color: #fde047;');
-            let hora = row.marcaTemporal ? `<div style="font-size:11px; margin-top:4px;">Reg: ${row.marcaTemporal.split(/\s+/).slice(1).join(' ')}</div>` : '';
-            return `<tr style="${rs}">
-                <td><strong>${row.fecha}</strong>${hora}</td>
-                <td><strong>${row.titular}</strong><div style="font-size:11px; text-transform:uppercase;">${row.medio}</div></td>
-                <td><span class="badge ${bc}">${row.tono}</span></td>
-                <td>${row.resumen}</td>
-                <td>${row.link.includes('http') ? `<a href="${row.link}" target="_blank" class="btn-link">Abrir</a>` : 'Sin Enlace'}</td>
-            </tr>`;
-        }).join('');
+            let badgeClass = 'badge-neutro', rowStyle = 'background-color: #fde047;';
+            if (tLow.includes('pos')) { badgeClass = 'badge-positivo'; rowStyle = 'background-color: #86efac;'; } 
+            else if (tLow.includes('neg')) { badgeClass = 'badge-negativo'; rowStyle = 'background-color: #fc8181;'; } 
+            
+            const linkHTML = row.link.includes('http') ? `<a href="${row.link}" target="_blank" class="btn-link">Abrir Nota</a>` : `<span style="color:#64748b; font-size:11px;">Sin Enlace</span>`;
+            
+            let horaRegistro = "";
+            if(row.marcaTemporal) { 
+                const parts = row.marcaTemporal.trim().split(/\s+/); 
+                if(parts.length >= 2) {
+                    let horaStr = parts.slice(1).join(' '); 
+                    horaRegistro = `<div style="font-size:11px; color:rgba(0,0,0,0.65); font-weight:700; margin-top:4px;">Registrado:<br>${horaStr}</div>`; 
+                }
+            }
+
+            tbody.innerHTML += `
+                <tr style="${rowStyle}">
+                    <td data-label="Fecha">
+                        <div style="font-weight:800;">${row.fecha}</div>
+                        ${horaRegistro}
+                    </td>
+                    <td data-label="Noticia">
+                        <div style="font-weight:800; margin-bottom:5px; font-size:14px;">${row.titular}</div>
+                        <div style="font-size:11px; color:var(--primary); font-weight:800; text-transform:uppercase;">${row.medio} (${row.tipoMedio})</div>
+                    </td>
+                    <td data-label="Tono"><span class="badge ${badgeClass}">${row.tono}</span></td>
+                    <td data-label="Resumen" style="font-weight:600;">${row.resumen}</td>
+                    <td data-label="Enlace">${linkHTML}</td>
+                </tr>`;
+        });
     }
 
+    // --- FUNCIÓN WHATSAPP RESTAURADA A SU FORMATO ORIGINAL ---
     function copiarWhatsApp() {
-        if (!currentFilteredData.length) return alert("No hay datos.");
-        let txt = `📋 *RESUMEN MML*\n📊 *Menciones:* ${currentFilteredData.length}\n\n`;
-        currentFilteredData.slice(0, 10).forEach(r => txt += `• [${r.tono}] *${r.medio}*: ${r.titular}\n`);
-        navigator.clipboard.writeText(txt).then(() => alert("Copiado al portapapeles."));
+        if (currentFilteredData.length === 0) return alert("No hay datos en la tabla para estructurar.");
+        
+        let filtroActivo = currentMode === 'hoy' ? "Hoy (y Rezagos)" : currentMode === 'rango_ayer_hoy' ? "Ayer y Hoy" : currentMode === 'month' ? "Este Mes" : document.getElementById('filterFecha').value;
+        
+        let grupos = { pos: [], neu: [], neg: [] };
+
+        // Agrupar todas las notas por tono
+        currentFilteredData.forEach(row => {
+            const t = row.tono.toLowerCase();
+            if (t.includes('pos')) grupos.pos.push(row);
+            else if (t.includes('neg')) grupos.neg.push(row);
+            else grupos.neu.push(row);
+        });
+
+        let textoWA = `📋 *RESUMEN DE MEDIOS MML*\n📅 *Fecha/Rango:* ${filtroActivo}\n📊 *Total Menciones:* ${currentFilteredData.length}\n\n`;
+
+        // Generar el bloque completo con todas las notas
+        function agregarBloque(titulo, emoji, filas) {
+            if (filas.length === 0) return "";
+            let bloque = `${emoji} *${titulo} (${filas.length})*\n\n`;
+            filas.forEach(row => {
+                bloque += `🔹 *${row.titular}*\n`;
+                bloque += `🎙️ _${row.medio} (${row.tipoMedio})_\n`;
+                if(row.link && row.link.includes('http')) {
+                    bloque += `🔗 ${row.link}\n`;
+                }
+                bloque += `\n`; // Espacio entre notas
+            });
+            return bloque;
+        }
+
+        textoWA += agregarBloque("NOTICIAS NEGATIVAS", "🔴", grupos.neg);
+        textoWA += agregarBloque("NOTICIAS NEUTRAS", "🟡", grupos.neu);
+        textoWA += agregarBloque("NOTICIAS POSITIVAS", "🟢", grupos.pos);
+        
+        textoWA += `_Generado desde el Semáforo de Medios MML._`;
+
+        navigator.clipboard.writeText(textoWA).then(() => { 
+            alert("📋 ¡Resumen completo copiado con éxito al portapapeles!"); 
+        }).catch(err => { 
+            alert("Error al copiar: " + err); 
+        });
     }
 
-    // --- IA RESTAURADA CON MANEJO DE ERRORES EXTREMO ---
-    function obtenerApiKeysArray() { return (localStorage.getItem('gemini_api_key_mml') || "").split(',').map(k => k.trim()).filter(k => k !== ""); }
+    // --- IA CON AUTO-FALLBACK ---
+    function obtenerApiKeysArray() {
+        let keysRaw = localStorage.getItem('gemini_api_key_mml');
+        if (!keysRaw) return [];
+        return keysRaw.split(',').map(k => k.trim()).filter(k => k !== "");
+    }
+    
     function gestionarApiKey() { 
         let currentKey = localStorage.getItem('gemini_api_key_mml') || "";
-        let newKey = prompt("Clave actual de Gemini:\n(Déjalo vacío para borrar)", currentKey);
-        if (newKey !== null) { newKey.trim() === "" ? localStorage.removeItem('gemini_api_key_mml') : localStorage.setItem('gemini_api_key_mml', newKey.trim()); }
+        let newKey = prompt("Gestión de API Key de Gemini\n(Déjalo vacío para borrarla):\n", currentKey);
+        if (newKey !== null) {
+            if (newKey.trim() === "") {
+                localStorage.removeItem('gemini_api_key_mml');
+                alert("API Key borrada.");
+            } else {
+                localStorage.setItem('gemini_api_key_mml', newKey.trim());
+                alert("API Key guardada exitosamente.");
+            }
+        }
     }
-    function abrirAnalistaIA() { document.getElementById('iaModal').style.display = "flex"; }
+    
+    function abrirAnalistaIA() { 
+        document.getElementById('iaModal').style.display = "flex"; 
+        const keys = obtenerApiKeysArray();
+        if(keys.length === 0 && document.getElementById('chat-history').innerHTML === "") {
+            appendMessage('ia', '¡Hola! Soy tu asistente IA. Para empezar, haz clic en <b>"🔑 API Key"</b> aquí arriba para conectar tu cuenta.');
+        }
+    }
+    
     function cerrarModal() { document.getElementById('iaModal').style.display = "none"; }
     function limpiarChat() { document.getElementById('chat-history').innerHTML = ''; }
     function handleEnter(e) { if (e.key === "Enter") enviarMensajeUsuario(); }
-    function enviarPromptRapido(t, p) { document.getElementById('userInput').value = p; enviarMensajeUsuario(); }
+
+    function enviarPromptRapido(titulo, promptTexto) {
+        document.getElementById('userInput').value = promptTexto;
+        enviarMensajeUsuario();
+    }
 
     async function enviarMensajeUsuario() {
         const inputObj = document.getElementById('userInput');
         const text = inputObj.value.trim();
         if(!text) return;
 
-        appendMessage('user', text); inputObj.value = '';
+        appendMessage('user', text);
+        inputObj.value = '';
         document.getElementById('btnSend').disabled = true;
         
         const keys = obtenerApiKeysArray();
@@ -527,39 +887,47 @@
         }
 
         const loadingId = 'loading-' + Date.now();
-        document.getElementById('chat-history').innerHTML += `<div id="${loadingId}" class="loading-ia"><div class="spinner"></div>Analizando...</div>`;
+        document.getElementById('chat-history').innerHTML += `<div id="${loadingId}" class="loading-ia"><div class="spinner"></div>Conectando a la red neuronal de Google...</div>`;
         scrollToBottom();
 
         const safeDataForAI = currentFilteredData.slice(0, 50).map(r => ({ Fecha: r.fecha, Titular: r.titular, Medio: r.medio, Tipo: r.tipoMedio, Tono: r.tono, Resumen: r.resumen }));
-        const promptFull = `Eres un experto analista político. Aquí tienes los datos actuales del Semáforo de la MML:\n${JSON.stringify(safeDataForAI)}\n\nPregunta: ${text}\n\nResponde en formato HTML básico (usa <b>, <ul>, <li>, <br>). Sé directo y profesional.`;
+        const promptFull = `Eres un experto analista político. Aquí tienes los datos actuales del Semáforo de la MML (máximo 50 notas):\n${JSON.stringify(safeDataForAI)}\n\nPregunta del usuario: ${text}\n\nResponde en formato HTML básico (usa <b>, <ul>, <li>, <br>). Sé directo, profesional y analítico. NO uses markdown tradicional.`;
 
         let success = false;
         let responseText = "";
         let errorDetallado = "Error desconocido";
 
+        // Lista de los modelos reales y más rápidos disponibles en Google API 
+        const modelosActivos = [
+            'gemini-1.5-flash', 
+            'gemini-1.5-flash-8b', 
+            'gemini-1.0-pro'
+        ];
+
+        outerLoop:
         for (let key of keys) {
-            try {
-                // Fetch protegido y monitoreado al milímetro
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: promptFull }] }] })
-                });
-                
-                const result = await response.json();
-                
-                if (result.error) {
-                    // Si Google rechaza la petición, capturamos exactamente por qué
-                    errorDetallado = `Google API Error: ${result.error.message} (Código: ${result.error.code})`;
-                    console.error("Gemini Error:", result.error);
-                } else if (result.candidates && result.candidates.length > 0) {
-                    responseText = result.candidates[0].content.parts[0].text;
-                    success = true;
-                    break;
+            for (let modelo of modelosActivos) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${key}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: promptFull }] }] })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.error) {
+                        errorDetallado = `[${modelo}] falló: ${result.error.message}`;
+                        console.warn(`Saltando modelo ${modelo} por error:`, result.error.message);
+                    } else if (result.candidates && result.candidates.length > 0) {
+                        responseText = result.candidates[0].content.parts[0].text;
+                        success = true;
+                        break outerLoop; 
+                    }
+                } catch (e) { 
+                    errorDetallado = `[${modelo}] Fallo en red: ` + e.message;
+                    console.error("Fetch Falló:", e); 
                 }
-            } catch (e) { 
-                errorDetallado = "Fallo de conexión en red o CORS: " + e.message;
-                console.error("Fetch Falló:", e); 
             }
         }
 
@@ -567,18 +935,26 @@
         document.getElementById('btnSend').disabled = false;
 
         if (success) {
-            appendMessage('ia', responseText);
+            let htmlFormatted = responseText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+            appendMessage('ia', htmlFormatted);
         } else {
-            // Imprime exactamente por qué falló para dejar de adivinar
-            appendMessage('ia', `<b style="color:#b91c1c;">Error de conexión con la IA.</b><br>Detalle técnico: <i>${errorDetallado}</i><br><br>Si el error dice 'API_KEY_INVALID' o 'QUOTA_EXCEEDED', tu clave ya no es válida o agotaste tus créditos. Usa el botón "🔑 API Key" para cambiarla.`);
+            appendMessage('ia', `<b style="color:#b91c1c;">Todos los modelos están saturados o la clave falló.</b><br>Detalle del último intento: <i>${errorDetallado}</i><br><br>Revisa tu API Key o inténtalo en unos minutos.`);
         }
     }
 
     function appendMessage(sender, text) {
-        document.getElementById('chat-history').innerHTML += `<div class="chat-bubble bubble-${sender}">${text}</div>`;
+        const chat = document.getElementById('chat-history');
+        const div = document.createElement('div');
+        div.className = `chat-bubble bubble-${sender}`;
+        div.innerHTML = text;
+        chat.appendChild(div);
         scrollToBottom();
     }
-    function scrollToBottom() { const c = document.getElementById('chat-history'); c.scrollTop = c.scrollHeight; }
+
+    function scrollToBottom() {
+        const chat = document.getElementById('chat-history');
+        chat.scrollTop = chat.scrollHeight;
+    }
 
     init();
 </script>
