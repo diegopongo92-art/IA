@@ -80,7 +80,7 @@
             </h2>
         </div>
         <div id="caja-analisis-ia" style="font-size: 14px; line-height: 1.6; color: #cbd5e1;">
-            <span style="color: #64748b; font-style: italic;">Conectando con el flujo de datos del Semáforo...</span>
+            <span style="color: #64748b; font-style: italic;">Iniciando escaneo de modelos disponibles en el servidor de Google...</span>
         </div>
     </div>
 
@@ -92,12 +92,9 @@
 
 <script>
     let todasLasNoticias = [];
-
-    // Clave de API segmentada para evitar bloqueos
     const apiKey = "AIzaSyCyGrUUejUbRAAU" + "tT9VmGs-oSbJj-TXJ_k";
 
     function init() {
-        // Datos de simulación idénticos a las columnas de tu Google Sheets
         todasLasNoticias = [
             { medio: "El Comercio", titular: "Municipalidad de Lima acelera obras estructurales en Vía Expresa Sur", tono: "Positivo", resumen: "Trabajos avanzan a ritmo acelerado para conectar distritos del sur." },
             { medio: "La República", titular: "Comerciantes protestan por desvíos de tránsito en obras del Centro de Lima", tono: "Negativo", resumen: "Exigen compensaciones por reducción de ventas durante la campaña." },
@@ -123,46 +120,74 @@
         document.getElementById('tabla-contenedor').innerHTML = html;
     }
 
-    // 🤖 ENLACE DE CONEXIÓN DEFINITIVO (MODELO GEMINI BASE UNIVERSAL)
+    // 🤖 IA CON AUTO-DETECCIÓN DE MODELO (SOLUCIÓN A PRUEBA DE BALAS)
     async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
-        if (!noticiasParaAnalizar || noticiasParaAnalizar.length === 0) {
-            document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #64748b; font-style: italic;'>No hay noticias suficientes para estructurar un análisis de coyuntura.</span>";
-            return;
-        }
+        if (!noticiasParaAnalizar || noticiasParaAnalizar.length === 0) return;
 
-        document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #3b82f6; font-style: italic;'>El analista político está procesando el impacto institucional en vivo...</span>";
-
-        // 🔥 LA CORRECCIÓN TOTAL: Se usa 'gemini-pro' plano, el alias maestro que la API v1 reconoce por defecto en todas las cuentas heredadas
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
-
-        const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
-            medio: nota.medio || "Prensa",
-            titulo: nota.titular || nota.titulo || "Sin título",
-            tono: nota.tono || "Neutral",
-            resumen: nota.resumen || "No detalla"
-        }));
-
-        const promptMaestro = `
-        Actúa como un Director de Inteligencia Política senior especialista en la política peruana y la gestión municipal de Lima Metropolitana.
-        Evalúa el siguiente paquete de noticias de nuestro monitoreo y crúzalo con tus conocimientos de la coyuntura nacional de HOY en el Perú.
+        const cajaIa = document.getElementById('caja-analisis-ia');
         
-        Encuentra patrones, intenciones de actores de oposición y riesgos de crisis ocultas para la alcaldía.
-
-        Noticias de hoy en nuestro Semáforo MML:
-        ${JSON.stringify(bloqueNoticias)}
-
-        Devuelve tu análisis estrictamente en este formato HTML limpio usando etiquetas <p> y <strong> (No uses bloques de código ni markdown):
-        <p><strong>🎯 1. La Agenda Oculta y Framing:</strong> Analiza qué encuadre están queriendo posicionar hoy contra o a favor de la gestión municipal.</p>
-        <p><strong>🔗 2. Hilos Conductores:</strong> Conecta estas notas con antecedentes de la gestión (Vía Expresa Sur, peajes, Campo de Marte, etc).</p>
-        <p><strong>⚠️ 3. Alerta de Flanco Débil:</strong> ¿Cuál es el flanco institucional más vulnerable para las próximas 48 horas?</p>
-        `;
-
-        const payload = {
-            contents: [{ parts: [{ text: promptMaestro }] }]
-        };
-
         try {
-            const response = await fetch(url, {
+            cajaIa.innerHTML = "<span style='color: #3b82f6; font-style: italic;'>1/2 Interrogando a Google por los modelos disponibles...</span>";
+
+            // PASO 1: LE PREGUNTAMOS A GOOGLE QUÉ MODELOS EXISTEN EN TU CUENTA
+            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+            const listResponse = await fetch(listUrl);
+            const listData = await listResponse.json();
+
+            if (!listData.models) {
+                throw new Error("No se pudo obtener la lista de modelos de Google.");
+            }
+
+            // Filtramos solo los modelos que sirven para generar texto ("generateContent")
+            const modelosValidos = listData.models.filter(m => 
+                m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent")
+            );
+
+            if (modelosValidos.length === 0) {
+                throw new Error("Tu API Key no tiene permisos para usar modelos de texto.");
+            }
+
+            // Elegimos el modelo más moderno (preferencia por 1.5-flash, luego cualquiera que funcione)
+            let modeloElegido = "";
+            const modeloFlash = modelosValidos.find(m => m.name.includes("gemini-1.5-flash"));
+            const modeloPro = modelosValidos.find(m => m.name.includes("gemini-1.5-pro"));
+            
+            if (modeloFlash) modeloElegido = modeloFlash.name;
+            else if (modeloPro) modeloElegido = modeloPro.name;
+            else modeloElegido = modelosValidos[0].name; // Si no hay esos, agarra el primero que vea
+
+            console.log("¡Hack completado! Modelo autodetectado:", modeloElegido);
+            cajaIa.innerHTML = `<span style='color: #3b82f6; font-style: italic;'>2/2 Modelo [${modeloElegido}] conectado. Procesando impacto institucional...</span>`;
+
+            // PASO 2: ARMAMOS LA URL CON EL MODELO EXACTO QUE GOOGLE NOS ACABA DE DECIR
+            const urlDefinitiva = `https://generativelanguage.googleapis.com/v1beta/${modeloElegido}:generateContent?key=${apiKey}`;
+
+            const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
+                medio: nota.medio || "Prensa",
+                titulo: nota.titular || nota.titulo || "Sin título",
+                tono: nota.tono || "Neutral",
+                resumen: nota.resumen || "No detalla"
+            }));
+
+            const promptMaestro = `
+            Actúa como un Director de Inteligencia Política senior especialista en la política peruana y la gestión municipal de Lima Metropolitana.
+            Evalúa el siguiente paquete de noticias de nuestro monitoreo y crúzalo con la coyuntura nacional de HOY en el Perú.
+            
+            Noticias de hoy en nuestro Semáforo MML:
+            ${JSON.stringify(bloqueNoticias)}
+
+            Devuelve tu análisis estrictamente en este formato HTML limpio usando etiquetas <p> y <strong>:
+            <p><strong>🎯 1. La Agenda Oculta y Framing:</strong> Analiza qué encuadre están queriendo posicionar hoy contra o a favor de la gestión municipal.</p>
+            <p><strong>🔗 2. Hilos Conductores:</strong> Conecta estas notas con antecedentes de la gestión (Vía Expresa Sur, peajes, Campo de Marte, etc).</p>
+            <p><strong>⚠️ 3. Alerta de Flanco Débil:</strong> ¿Cuál es el flanco institucional más vulnerable para las próximas 48 horas?</p>
+            `;
+
+            const payload = {
+                contents: [{ parts: [{ text: promptMaestro }] }]
+            };
+
+            // PASO 3: ENVIAMOS LA PETICIÓN
+            const response = await fetch(urlDefinitiva, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -171,15 +196,14 @@
             const responseData = await response.json();
             
             if (responseData.candidates && responseData.candidates.length > 0) {
-                const textoAnalisis = responseData.candidates[0].content.parts[0].text;
-                document.getElementById('caja-analisis-ia').innerHTML = textoAnalisis;
+                cajaIa.innerHTML = responseData.candidates[0].content.parts[0].text;
             } else {
-                console.error("Respuesta de Google:", responseData);
-                document.getElementById('caja-analisis-ia').innerHTML = `<em>IA en mantenimiento temporal: ${responseData.error?.message || 'Error de sincronización estructural'}</em>`;
+                console.error("Respuesta final de Google:", responseData);
+                cajaIa.innerHTML = `<em>IA en mantenimiento: ${responseData.error?.message || 'Error al generar el texto'}</em>`;
             }
         } catch (error) {
             console.error("Error crítico en fetch:", error);
-            document.getElementById('caja-analisis-ia').innerHTML = "<em>Error de conexión con el analista político virtual. Intente recargar la página.</em>";
+            cajaIa.innerHTML = `<em>Error en el sistema: ${error.message}</em>`;
         }
     }
 
