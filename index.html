@@ -666,36 +666,12 @@
     }
 
     
-    // 🔥 NUEVA FUNCIÓN: Conecta con Gemini 1.5 Flash
-   // Borra desde aquí:
+    // 🔥 NUEVA FUNCIÓN: Conecta con Gemini 1.5 Flash con tu nueva clave activa
     async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
-        // Clave activada directamente para tu archivo de pruebas independiente en GitHub
-        const apiKey = "AIzaSyBaWnyHyZjOs2dFXorvoSYVANXT96TqZB8";
-        
-        if (!apiKey) {
-            ... (varias líneas de código adentro) ...
-        } catch (error) {
-            console.error("Error en el analista de IA:", error);
-            document.getElementById('caja-analisis-ia').innerHTML = "...";
-        }
-    }
+        const apiKey = "AIzaSyC3SyvPVlkPo8CLI76vdgCnDFkbTbJ03-4";
 
-        / ... (Aquí termina el código antiguo de tu tabla que dibuja las filas) ...
-            tbody.innerHTML += `
-                <tr style="${rowStyle}">
-                    ...
-                </tr>
-            `;
-        });
-    }
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    // ====================================================================
-    // 🔥 AQUÍ VA EL NUEVO CÓDIGO SEGURO QUE CONECTA CON /api/analizar
-    // ====================================================================
-    async function activarAnalistaPoliticoIA(noticiasParaAnalizar) {
-        document.getElementById('caja-analisis-ia').innerHTML = "<span style='color: #94a3b8; font-style: italic;'>Analizando contexto nacional en tiempo real...</span>";
-
-        // Reducimos los datos para enviar solo lo necesario
         const bloqueNoticias = noticiasParaAnalizar.slice(0, 15).map(nota => ({
             medio: nota.medio,
             titulo: nota.titular,
@@ -703,32 +679,50 @@
             resumen: nota.resumen
         }));
 
+        const promptMaestro = `
+        Actúa como un Director de Inteligencia Política senior especialista en la política peruana y la gestión municipal de Lima Metropolitana.
+        Tu tarea es evaluar el siguiente paquete de noticias de nuestro monitoreo y crúzalo con la coyuntura nacional de HOY en el Perú usando tu buscador incorporado de Google Search.
+        
+        Encuentra patrones, intenciones de actores de oposición y riesgos de crisis ocultas.
+
+        Noticias de hoy en nuestro Semáforo MML:
+        \${JSON.stringify(bloqueNoticias)}
+
+        Devuelve tu análisis estrictamente en este formato HTML limpio (usa exclusivamente etiquetas <p>, <ul>, <li> y <strong>):
+        
+        <p><strong>🎯 1. La Agenda Oculta y Framing:</strong> Analiza qué encuadre (framing) están queriening posicionar hoy contra o a favor de la gestión municipal.</p>
+        <p><strong>🔗 2. Hilos Conductores:</strong> Conecta estas notas con antecedentes de la gestión (Vía Expresa Sur, peajes, Campo de Marte, etc).</p>
+        <p><strong>⚠️ 3. Alerta de Flanco Débil:</strong> ¿Cuál es el flanco institucional más vulnerable para las próximas 48 horas?</p>
+        `;
+
+        const payload = {
+            contents: [{ parts: [{ text: promptMaestro }] }],
+            tools: [{ googleSearchGrounding: {} }] 
+        };
+
         try {
-            // Llamamos a nuestra función segura de Vercel
-            const response = await fetch('/api/analizar', {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ noticias: bloqueNoticias })
+                body: JSON.stringify(payload)
             });
 
             const responseData = await response.json();
-
+            
             if (responseData.candidates && responseData.candidates.length > 0) {
                 const textoAnalisis = responseData.candidates[0].content.parts[0].text;
                 document.getElementById('caja-analisis-ia').innerHTML = textoAnalisis;
             } else {
                 console.error(responseData);
-                const msgError = responseData.error?.message || "Error desconocido en los candidatos.";
-                document.getElementById('caja-analisis-ia').innerHTML = `<em>Error de la IA: ${msgError}</em>`;
+                const msgError = responseData.error?.message || "Error desconocido o límite de cuota excedido.";
+                document.getElementById('caja-analisis-ia').innerHTML = `<em>La IA no pudo procesar: \${msgError}</em>`;
             }
         } catch (error) {
-            console.error("Error de conexión:", error);
-            document.getElementById('caja-analisis-ia').innerHTML = "<em>Error al conectar con el servidor de análisis.</em>";
+            console.error("Error en el analista de IA:", error);
+            document.getElementById('caja-analisis-ia').innerHTML = "El analista virtual está procesando el flujo informativo actual. Espere un momento.";
         }
     }
-    // ====================================================================
 
-    // Esto NO lo borres, es lo que arranca toda tu página:
     init();
 </script>
 </body>
