@@ -6,6 +6,7 @@
     <title>Semaforo MML | Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #002f80; --bg: #f1f5f9; --accent: #2563eb; }
@@ -74,14 +75,29 @@
         .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; text-align: center; white-space: nowrap; }
         .btn-link:hover { background: #1d4ed8; }
 
-        /* SECCIÓN DE DESGLOSE ANALÍTICO (SÓLO NÚMEROS OBJETIVOS) */
+        /* SECCIÓN DE DATOS E INDICADORES NUMÉRICOS */
         .insights-section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); page-break-inside: avoid; }
         .insights-header { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 15px; }
-        .insights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .insights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
         .insight-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
         .insight-box h4 { margin: 0 0 10px 0; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
         .automated-text { font-size: 12px; line-height: 1.6; color: #0f172a; font-weight: 600; }
         .automated-text ul { margin: 5px 0 0 0; padding-left: 18px; }
+
+        /* NUEVA ZONA: GRÁFICOS Y FOCOS DEL REPORTE DE CRISIS */
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 25px; page-break-inside: avoid; }
+        .chart-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 260px; display: flex; flex-direction: column; justify-content: space-between; }
+        .chart-box h3 { font-size: 12px; font-weight: 800; color: #475569; margin: 0 0 10px 0; text-transform: uppercase; }
+        .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; min-height: 0; }
+
+        .narratives-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; page-break-inside: avoid; }
+        .narrative-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .narrative-card.critical { border-left: 5px solid #ef4444; }
+        .narrative-card.constructive { border-left: 5px solid #10b981; }
+        .narrative-card h3 { font-size: 12px; font-weight: 800; margin: 0 0 12px 0; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .narrative-list { display: flex; flex-direction: column; gap: 8px; font-size: 12px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .narrative-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; font-weight: 600; line-height: 1.4; }
+        .narrative-meta { font-size: 10px; color: #64748b; font-weight: 700; margin-top: 4px; text-transform: uppercase; display: flex; justify-content: space-between; }
 
         /* Ventana Modal IA */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
@@ -120,7 +136,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 768px) {
-            .insights-grid { grid-template-columns: 1fr; gap: 15px; }
+            .insights-grid, .charts-container, .narratives-container { grid-template-columns: 1fr; gap: 15px; }
             .header-left { gap: 10px; }
             .header-logo { height: 26px; padding: 4px 6px; }
             header h1 { font-size: 0.85rem !important; }
@@ -255,20 +271,50 @@
         </button>
     </div>
 
+    <div class="charts-container">
+        <div class="chart-box">
+            <h3>📈 Línea de Tiempo: Evolución Informativa</h3>
+            <div class="chart-wrapper">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <h3>📊 Distribución de Balance (Share of Voice)</h3>
+            <div class="chart-wrapper">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <div class="insights-section">
-        <div class="insights-header">📊 Desglose Analítico de la Jornada (Métricas de Filtro Actual)</div>
+        <div class="insights-header">📋 Indicadores de Cobertura Activa</div>
         <div class="insights-grid">
             <div class="insight-box">
                 <h4>📈 Distribución de Tono</h4>
                 <div id="analytics-tonos" class="automated-text">Calculando porcentajes...</div>
             </div>
             <div class="insight-box">
-                <h4>🏷️ Temas / Etiquetas Predominantes</h4>
+                <h4>🏷️ Volumen por Tema Principal</h4>
                 <div id="analytics-temas" class="automated-text">Extrayendo volumen por tema...</div>
             </div>
             <div class="insight-box">
-                <h4>🎙️ Origen y Focos de Medios</h4>
+                <h4>🎙️ Foco y Origen Crítico</h4>
                 <div id="analytics-canales" class="automated-text">Identificando canales y alertas críticas...</div>
+            </div>
+        </div>
+
+        <div class="narratives-container">
+            <div class="narrative-card critical">
+                <h3 style="color: #b91c1c;">🔴 Focos Críticos de la Jornada (Notas Adversas)</h3>
+                <div id="critical-narratives-list" class="narrative-list">
+                    <div style="color: #64748b; font-size: 11px;">No se registran menciones críticas en los filtros actuales.</div>
+                </div>
+            </div>
+            <div class="narrative-card constructive">
+                <h3 style="color: #0f5132;">🟢 Focos Constructivos de la Jornada (Notas Favorables)</h3>
+                <div id="positive-narratives-list" class="narrative-list">
+                    <div style="color: #64748b; font-size: 11px;">No se registran menciones positivas en los filtros actuales.</div>
+                </div>
             </div>
         </div>
     </div>
@@ -318,6 +364,10 @@
 
     let chatContext = [];
     let promptInicialIA = ""; 
+
+    // Instancias globales de gráficos
+    let timelineChartInstance = null;
+    let pieChartInstance = null;
 
     async function init() {
         try {
@@ -506,67 +556,132 @@
         
         calcularYRenderizarTendencias();
         generarAuditoriaNumericaObjetiva(currentFilteredData, countPos, countNeu, countNeg);
+        renderizarGraficosYFocos(currentFilteredData, countPos, countNeu, countNeg);
         renderTable(currentFilteredData, horaInput);
     }
 
-    // NUEVO MOTOR: AUDITORÍA 100% NUMÉRICA Y BASADA EN HECHOS (SIN ADJETIVOS)
     function generarAuditoriaNumericaObjetiva(data, pos, neu, neg) {
         const tTonos = document.getElementById('analytics-tonos');
         const tTemas = document.getElementById('analytics-temas');
         const tCanales = document.getElementById('analytics-canales');
 
         if (data.length === 0) {
-            tTonos.innerHTML = "Sin datos en el corte.";
-            tTemas.innerHTML = "Sin datos en el corte.";
-            tCanales.innerHTML = "Sin datos en el corte.";
+            tTonos.innerHTML = "Sin datos."; tTemas.innerHTML = "Sin datos."; tCanales.innerHTML = "Sin datos.";
             return;
         }
 
         const total = data.length;
-        const pctPos = ((pos / total) * 100).toFixed(1);
-        const pctNeu = ((neu / total) * 100).toFixed(1);
-        const pctNeg = ((neg / total) * 100).toFixed(1);
+        tTonos.innerHTML = `• <b>Positivas:</b> ${pos} (${((pos/total)*100).toFixed(1)}%)<br>` +
+                           `• <b>Neutras:</b> ${neu} (${((neu/total)*100).toFixed(1)}%)<br>` +
+                           `• <b>Negativas:</b> ${neg} (${((neg/total)*100).toFixed(1)}%)`;
 
-        // 1. Render Tonos
-        tTonos.innerHTML = `• <b>Positivas:</b> ${pos} (${pctPos}%)<br>` +
-                           `• <b>Neutras:</b> ${neu} (${pctNeu}%)<br>` +
-                           `• <b>Negativas:</b> ${neg} (${pctNeg}%)`;
-
-        // 2. Render Temas (Top 3)
         let mapaEtiquetas = {};
         data.forEach(r => { if(r.etiqueta) mapaEtiquetas[r.etiqueta] = (mapaEtiquetas[r.etiqueta] || 0) + 1; });
-        let temasOrdenados = Object.keys(mapaEtiquetas).map(key => ({tema: key, qty: mapaEtiquetas[key]}));
-        temasOrdenados.sort((a,b) => b.qty - a.qty);
+        let temasOrdenados = Object.keys(mapaEtiquetas).map(key => ({tema: key, qty: mapaEtiquetas[key]})).sort((a,b) => b.qty - a.qty);
 
         if(temasOrdenados.length > 0) {
             let htmlTemas = "<ul>";
-            temasOrdenados.slice(0, 3).forEach(t => {
-                htmlTemas += `<li><b>${t.tema}:</b> ${t.qty} menciones</li>`;
-            });
-            htmlTemas += "</ul>";
-            tTemas.innerHTML = htmlTemas;
-        } else {
-            tTemas.innerHTML = "No se registraron etiquetas en los ítems filtrados.";
-        }
+            temasOrdenados.slice(0, 3).forEach(t => { htmlTemas += `<li><b>${t.tema}:</b> ${t.qty} notas</li>`; });
+            tTemas.innerHTML = htmlTemas + "</ul>";
+        } else { tTemas.innerHTML = "Sin etiquetas registradas."; }
 
-        // 3. Origen por canal y Medios Críticos
-        let mapaCanales = {};
-        let mapaMediosNegativos = {};
+        let mapaCanales = {}; let mapaMediosNegativos = {};
         data.forEach(r => {
             if(r.tipoMedio) mapaCanales[r.tipoMedio] = (mapaCanales[r.tipoMedio] || 0) + 1;
-            if(r.tono.toLowerCase().includes('neg') && r.medio) {
-                mapaMediosNegativos[r.medio] = (mapaMediosNegativos[r.medio] || 0) + 1;
-            }
+            if(r.tono.toLowerCase().includes('neg') && r.medio) mapaMediosNegativos[r.medio] = (mapaMediosNegativos[r.medio] || 0) + 1;
         });
 
-        let canalMasFrecuente = "Ninguno"; let maxCanal = 0;
+        let canalMasFrecuente = "Ninguno", maxCanal = 0;
         for (let c in mapaCanales) { if(mapaCanales[c] > maxCanal) { maxCanal = mapaCanales[c]; canalMasFrecuente = c; } }
-
-        let medioMasCritico = "Ninguno"; let maxNeg = 0;
+        let medioMasCritico = "Ninguno", maxNeg = 0;
         for (let m in mapaMediosNegativos) { if(mapaMediosNegativos[m] > maxNeg) { maxNeg = mapaMediosNegativos[m]; medioMasCritico = m; } }
 
         tCanales.innerHTML = `• <b>Canal principal:</b> ${canalMasFrecuente} (${maxCanal} notas)<br>` +
-                             `• <b>Mayor volumen crítico:</b> ${medioMasCritico} (${maxNeg} notas negativas)`;
+                             `• <b>Mayor volumen crítico:</b> ${medioMasCritico} (${maxNeg} notas)`;
+    }
+
+    // MOTOR NUEVO: RENDER DE GRÁFICOS Y FOCOS NARRATIVOS (ESTILO REPORTE DE CRISIS)
+    function renderizarGraficosYFocos(data, pos, neu, neg) {
+        // --- 1. PROCESAR FOCOS NARRATIVOS COMPACTOS ---
+        const listaCriticas = document.getElementById('critical-narratives-list');
+        const listaPositivas = document.getElementById('positive-narratives-list');
+        
+        let notasNegativas = data.filter(r => r.tono.toLowerCase().includes('neg')).slice(0, 4);
+        let notasPositivas = data.filter(r => r.tono.toLowerCase().includes('pos')).slice(0, 4);
+
+        if(notasNegativas.length > 0) {
+            listaCriticas.innerHTML = '';
+            notasNegativas.forEach(r => {
+                listaCriticas.innerHTML += `<div class="narrative-item">` +
+                    `<div>${r.titular}</div>` +
+                    `<div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver nota ↗</a></div>` +
+                `</div>`;
+            });
+        } else { listaCriticas.innerHTML = `<div style="color: #64748b; font-size: 11px; padding:10px;">No se registran notas adversas en este corte.</div>`; }
+
+        if(notasPositivas.length > 0) {
+            listaPositivas.innerHTML = '';
+            notasPositivas.forEach(r => {
+                listaPositivas.innerHTML += `<div class="narrative-item">` +
+                    `<div>${r.titular}</div>` +
+                    `<div class="narrative-meta"><span>🎙️ ${r.medio}</span> <a href="${r.link}" target="_blank" style="color:var(--accent); text-decoration:none;">Ver nota ↗</a></div>` +
+                `</div>`;
+            });
+        } else { listaPositivas.innerHTML = `<div style="color: #64748b; font-size: 11px; padding:10px;">No se registran notas favorables en este corte.</div>`; }
+
+        // --- 2. RENDER DE GRÁFICO CIRCULAR (SOV) ---
+        if(pieChartInstance) pieChartInstance.destroy();
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        pieChartInstance = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Positivas', 'Neutras', 'Negativas'],
+                datasets: [{
+                    data: [pos, neu, neg],
+                    backgroundColor: ['#86efac', '#fde047', '#fc8181'],
+                    borderColor: ['#4ade80', '#facc15', '#f87171'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } } }
+        });
+
+        // --- 3. RENDER DE GRÁFICO DE LÍNEA DE TIEMPO (EVOLUCIÓN) ---
+        let mapaFechas = {};
+        allData.slice(0, 150).forEach(r => {
+            if(!mapaFechas[r.fecha]) mapaFechas[r.fecha] = { pos: 0, neu: 0, neg: 0 };
+            const t = r.tono.toLowerCase();
+            if(t.includes('pos')) mapaFechas[r.fecha].pos++;
+            else if(t.includes('neg')) mapaFechas[r.fecha].neg++;
+            else mapaFechas[r.fecha].neu++;
+        });
+
+        let fechasOrdenadas = Object.keys(mapaFechas).sort((a,b) => parseExcelDate(a) - parseExcelDate(b)).slice(-7); // Últimos 7 días activos
+        let dataLinePos = [], dataLineNeu = [], dataLineNeg = [];
+        fechasOrdenadas.forEach(f => {
+            dataLinePos.push(mapaFechas[f].pos);
+            dataLineNeu.push(mapaFechas[f].neu);
+            dataLineNeg.push(mapaFechas[f].neg);
+        });
+
+        if(timelineChartInstance) timelineChartInstance.destroy();
+        const ctxLine = document.getElementById('timelineChart').getContext('2d');
+        timelineChartInstance = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: fechasOrdenadas,
+                datasets: [
+                    { label: 'Positivas', data: dataLinePos, borderColor: '#15803d', backgroundColor: '#86efac', tension: 0.2 },
+                    { label: 'Neutras', data: dataLineNeu, borderColor: '#a16207', backgroundColor: '#fde047', tension: 0.2 },
+                    { label: 'Negativas', data: dataLineNeg, borderColor: '#b91c1c', backgroundColor: '#fc8181', tension: 0.2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } },
+                plugins: { legend: { position: 'top', labels: { boxWidth: 10, font: { size: 10 } } } }
+            }
+        });
     }
 
     function renderTable(data, horaInput) {
@@ -593,119 +708,65 @@
         });
     }
 
-    // REPORTE WHATSAPP COMPLETAMENTE LIMPIO DE INSIGHTS
     function copiarWhatsApp() {
         if (currentFilteredData.length === 0) return alert("No hay datos en la tabla para estructurar.");
-
-        let filtroActivo = "Reporte Actual";
-        if (currentMode === 'hoy') filtroActivo = "Hoy (y Rezagos)";
-        else if (currentMode === 'rango_ayer_hoy') filtroActivo = "Ayer y Hoy";
-        else if (currentMode === 'month') filtroActivo = "Este Mes";
-        else if (currentMode === 'specific') filtroActivo = document.getElementById('filterFecha').value;
-
-        let grupos = { 
-            pos: { filas: [], medios: new Set() }, 
-            neu: { filas: [], medios: new Set() }, 
-            neg: { filas: [], medios: new Set() } 
-        };
+        let filtroActivo = currentMode === 'hoy' ? "Hoy (y Rezagos)" : currentMode === 'rango_ayer_hoy' ? "Ayer y Hoy" : currentMode === 'month' ? "Este Mes" : document.getElementById('filterFecha').value;
+        let grupos = { pos: { filas: [], medios: new Set() }, neu: { filas: [], medios: new Set() }, neg: { filas: [], medios: new Set() } };
 
         currentFilteredData.forEach(row => {
-            const t = row.tono.toLowerCase();
-            let cat = 'neu';
-            if (t.includes('pos')) cat = 'pos';
-            else if (t.includes('neg')) cat = 'neg';
-            
+            const t = row.tono.toLowerCase(); let cat = 'neu';
+            if (t.includes('pos')) cat = 'pos'; else if (t.includes('neg')) cat = 'neg';
             grupos[cat].filas.push(row);
-            if (row.medio && row.medio.trim() !== "") {
-                grupos[cat].medios.add(row.medio.trim().toUpperCase());
-            }
+            if (row.medio && row.medio.trim() !== "") grupos[cat].medios.add(row.medio.trim().toUpperCase());
         });
 
         let textoWA = `📋 *RESUMEN DE MEDIOS MML*\n📅 *Rango:* ${filtroActivo}\n📊 *Menciones totales:* ${currentFilteredData.length}\n\n`;
 
         function generarBloqueCompacto(titulo, emoji, group) {
             if (group.filas.length === 0) return "";
-            
             let bloque = `${emoji} *${titulo} (${group.filas.length})*\n`;
-            let titularesMostrados = [];
-            let palabrasClaveVistas = [];
+            let titularesMostrados = []; let palabrasClaveVistas = [];
 
             for (let row of group.filas) {
                 if (titularesMostrados.length >= 3) break;
                 let palabrasLargas = row.titular.toLowerCase().split(/[\s,.:;()""'']+/).filter(w => w.length > 5);
                 let esRepetido = palabrasLargas.some(w => palabrasClaveVistas.includes(w));
-
-                if (!esRepetido || titularesMostrados.length === 0) {
-                    titularesMostrados.push(row.titular);
-                    palabrasClaveVistas.push(...palabrasLargas);
-                }
+                if (!esRepetido || titularesMostrados.length === 0) { titularesMostrados.push(row.titular); palabrasClaveVistas.push(...palabrasLargas); }
             }
-
             if (titularesMostrados.length === 0 && group.filas.length > 0) {
-                for (let i = 0; i < Math.min(3, group.filas.length); i++) {
-                    titularesMostrados.push(group.filas[i].titular);
-                }
+                for (let i = 0; i < Math.min(3, group.filas.length); i++) titularesMostrados.push(group.filas[i].titular);
             }
-
             titularesMostrados.forEach(tit => { bloque += `• ${tit}\n`; });
-
-            if (group.medios.size > 0) {
-                let stringMedios = Array.from(group.medios).join(", ");
-                bloque += `📢 _Medios que reportaron:_ ${stringMedios}\n`;
-            }
-
+            if (group.medios.size > 0) bloque += `📢 _Medios:_ ${Array.from(group.medios).join(", ")}\n`;
             return bloque + "\n";
         }
 
         textoWA += generarBloqueCompacto("NOTICIAS NEGATIVAS", "🔴", grupos.neg);
         textoWA += generarBloqueCompacto("NOTICIAS NEUTRAS", "🟡", grupos.neu);
         textoWA += generarBloqueCompacto("NOTICIAS POSITIVAS", "🟢", grupos.pos);
-
         textoWA += `_Generado automáticamente desde el Semáforo de Medios MML._`;
 
-        navigator.clipboard.writeText(textoWA).then(() => {
-            alert("📋 ¡Resumen compacto copiado con éxito!");
-        }).catch(err => { alert("Error al copiar: " + err); });
+        navigator.clipboard.writeText(textoWA).then(() => { alert("📋 ¡Resumen compacto copiado con éxito!"); }).catch(err => { alert("Error: " + err); });
     }
 
     function calcularYRenderizarTendencias() {
-        let hTotal = 0, hPos = 0, hNeu = 0, hNeg = 0;
-        let aTotal = 0, aPos = 0, aNeu = 0, aNeg = 0;
-
+        let hTotal = 0, hPos = 0, hNeu = 0, hNeg = 0; let aTotal = 0, aPos = 0, aNeu = 0, aNeg = 0;
         allData.forEach(row => {
-            const t = parseExcelDate(row.fecha);
-            if (!t) return;
+            const t = parseExcelDate(row.fecha); if (!t) return;
             const tonoLow = row.tono.toLowerCase();
-
-            if (t === hoyTime) {
-                hTotal++;
-                if (tonoLow.includes('pos')) hPos++; else if (tonoLow.includes('neg')) hNeg++; else hNeu++;
-            } else if (t === ayerTime) {
-                aTotal++;
-                if (tonoLow.includes('pos')) aPos++; else if (tonoLow.includes('neg')) aNeg++; else aNeu++;
-            }
+            if (t === hoyTime) { hTotal++; if (tonoLow.includes('pos')) hPos++; else if (tonoLow.includes('neg')) hNeg++; else hNeu++; } 
+            else if (t === ayerTime) { aTotal++; if (tonoLow.includes('pos')) aPos++; else if (tonoLow.includes('neg')) aNeg++; else aNeu++; }
         });
-
-        inyectarFlecha('trend-total', hTotal, aTotal, 'neutro');
-        inyectarFlecha('trend-pos', hPos, aPos, 'positivo');
-        inyectarFlecha('trend-neu', hNeu, aNeu, 'neutro');
-        inyectarFlecha('trend-neg', hNeg, aNeg, 'negativo');
+        inyectarFlecha('trend-total', hTotal, aTotal, 'neutro'); inyectarFlecha('trend-pos', hPos, aPos, 'positivo');
+        inyectarFlecha('trend-neu', hNeu, aNeu, 'neutro'); inyectarFlecha('trend-neg', hNeg, aNeg, 'negativo');
     }
 
     function inyectarFlecha(idElemento, conteoHoy, conteoAyer, tipoTono) {
-        const el = document.getElementById(idElemento);
-        if (!el) return;
+        const el = document.getElementById(idElemento); if (!el) return;
         if (conteoHoy === 0 && conteoAyer === 0) { el.innerHTML = ""; return; }
-
-        if (conteoHoy > conteoAyer) {
-            el.innerHTML = " ▲";
-            el.style.color = (tipoTono === 'positivo') ? '#16a34a' : (tipoTono === 'negativo' ? '#dc2626' : '#475569');
-        } else if (conteoHoy < conteoAyer) {
-            el.innerHTML = " ▼";
-            el.style.color = (tipoTono === 'positivo') ? '#dc2626' : (tipoTono === 'negativo' ? '#16a34a' : '#475569');
-        } else {
-            el.innerHTML = " ="; el.style.color = "#64748b";
-        }
+        if (conteoHoy > conteoAyer) { el.innerHTML = " ▲"; el.style.color = (tipoTono === 'positivo') ? '#16a34a' : (tipoTono === 'negativo' ? '#dc2626' : '#475569'); } 
+        else if (conteoHoy < conteoAyer) { el.innerHTML = " ▼"; el.style.color = (tipoTono === 'positivo') ? '#dc2626' : (tipoTono === 'negativo' ? '#16a34a' : '#475569'); } 
+        else { el.innerHTML = " ="; el.style.color = "#64748b"; }
     }
 
     /* ==========================================================
@@ -713,90 +774,41 @@
        ========================================================== */
     function obtenerApiKeysArray() {
         let keysRaw = localStorage.getItem('gemini_api_key_mml');
-        if (!keysRaw) {
-            keysRaw = prompt("Ingresa tu(s) API Key(s) de Gemini separadas por comas:");
-            if (keysRaw) localStorage.setItem('gemini_api_key_mml', keysRaw.trim());
-        }
+        if (!keysRaw) { keysRaw = prompt("Ingresa tu(s) API Key(s) de Gemini:"); if (keysRaw) localStorage.setItem('gemini_api_key_mml', keysRaw.trim()); }
         return keysRaw ? keysRaw.split(',').map(k => k.trim()).filter(k => k !== "") : [];
     }
-
     function borrarApiKey() { localStorage.removeItem('gemini_api_key_mml'); alert("API Keys eliminadas."); cerrarModal(); }
-
     function construirPromptInicial() {
         const dataOptimizada = currentFilteredData.slice(0, 40);
         let textoNoticias = "DATOS CONTEXTUALES:\n";
-        dataOptimizada.forEach((row, i) => {
-            textoNoticias += `${i+1}. [${row.tono}] ${row.medio}: ${row.titular}\n`;
-        });
+        dataOptimizada.forEach((row, i) => { textoNoticias += `${i+1}. [${row.tono}] ${row.medio}: ${row.titular}\n`; });
         promptInicialIA = `${textoNoticias}\n\nResponde de manera directa, concisa y con enfoque político.`;
     }
-
-    function abrirAnalistaIA() {
-        const keys = obtenerApiKeysArray(); if (keys.length === 0) return;
-        document.getElementById('iaModal').style.display = "flex";
-        if (document.getElementById('chat-history').innerHTML.trim() === '') limpiarChat(true);
-    }
-
-    function limpiarChat(esInicio = false) {
-        document.getElementById('chat-history').innerHTML = ''; chatContext = [];
-        agregarBurbuja(esInicio ? "👋 ¡Hola! Datos listos para procesar. ¿Qué análisis deseas realizar hoy?" : "🧹 Historial limpio.", "ia");
-    }
-
+    function abrirAnalistaIA() { const keys = obtenerApiKeysArray(); if (keys.length === 0) return; document.getElementById('iaModal').style.display = "flex"; if (document.getElementById('chat-history').innerHTML.trim() === '') limpiarChat(true); }
+    function limpiarChat(esInicio = false) { document.getElementById('chat-history').innerHTML = ''; chatContext = []; agregarBurbuja(esInicio ? "👋 ¡Hola! Datos listos para procesar. ¿Qué análisis deseas realizar hoy?" : "🧹 Historial limpio.", "ia"); }
     function cerrarModal() { document.getElementById('iaModal').style.display = "none"; }
     function handleEnter(event) { if (event.key === "Enter") enviarMensajeUsuario(); }
-
     function enviarMensajeUsuario() {
-        const input = document.getElementById('userInput'); const texto = input.value.trim();
-        if (!texto) return; input.value = '';
+        const input = document.getElementById('userInput'); const texto = input.value.trim(); if (!texto) return; input.value = '';
         agregarBurbuja(texto, "user"); construirPromptInicial();
         chatContext.push({ role: "user", parts: [{ text: chatContext.length === 0 ? promptInicialIA + "\n\nPREGUNTA: " + texto : texto }] });
         agregarSpinner(); procesarConIA(chatContext);
     }
-
-    function enviarPromptRapido(titulo, promptOculto) {
-        agregarBurbuja(titulo, "user"); agregarSpinner(); construirPromptInicial();
-        procesarConIA([{ role: "user", parts: [{ text: promptInicialIA + "\n\nTAREA: " + promptOculto }] }], true);
-    }
-
-    function agregarBurbuja(texto, sender) {
-        const ch = document.getElementById('chat-history'); const div = document.createElement('div');
-        div.className = `chat-bubble bubble-${sender}`;
-        div.innerHTML = sender === 'ia' ? convertirMarkdownAModal(texto) : texto;
-        ch.appendChild(div); ch.scrollTop = ch.scrollHeight;
-    }
-
-    function agregarSpinner() {
-        const div = document.createElement('div'); div.id = "temp-spinner"; div.className = "loading-ia";
-        div.innerHTML = `<div class="spinner"></div>`; document.getElementById('chat-history').appendChild(div);
-        document.getElementById('btnSend').disabled = true;
-    }
-
-    function quitarSpinner() {
-        const s = document.getElementById('temp-spinner'); if (s) s.remove();
-        document.getElementById('btnSend').disabled = false;
-    }
-
+    function enviarPromptRapido(titulo, promptOculto) { agregarBurbuja(titulo, "user"); agregarSpinner(); construirPromptInicial(); procesarConIA([{ role: "user", parts: [{ text: promptInicialIA + "\n\nTAREA: " + promptOculto }] }], true); }
+    function agregarBurbuja(texto, sender) { const ch = document.getElementById('chat-history'); const div = document.createElement('div'); div.className = `chat-bubble bubble-${sender}`; div.innerHTML = sender === 'ia' ? convertirMarkdownAModal(texto) : texto; ch.appendChild(div); ch.scrollTop = ch.scrollHeight; }
+    function agregarSpinner() { const div = document.createElement('div'); div.id = "temp-spinner"; div.className = "loading-ia"; div.innerHTML = `<div class="spinner"></div>`; document.getElementById('chat-history').appendChild(div); document.getElementById('btnSend').disabled = true; }
+    function quitarSpinner() { const s = document.getElementById('temp-spinner'); if (s) s.remove(); document.getElementById('btnSend').disabled = false; }
     async function procesarConIA(historialAEnviar, esBotonRapido = false) {
         const keys = obtenerApiKeysArray(); if (keys.length === 0) { quitarSpinner(); return; }
         let idx = parseInt(localStorage.getItem('gemini_key_index') || '0') % keys.length;
         try {
-            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keys[idx]}`, {
-                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: historialAEnviar })
-            });
-            if (!r.ok) throw new Error("Error en llave.");
-            const d = await r.json(); const res = d.candidates[0].content.parts[0].text;
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keys[idx]}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: historialAEnviar }) });
+            if (!r.ok) throw new Error("Error en llave."); const d = await r.json(); const res = d.candidates[0].content.parts[0].text;
             if (!esBotonRapido) chatContext.push({ role: "model", parts: [{ text: res }] });
             quitarSpinner(); agregarBurbuja(res, "ia");
-        } catch (e) {
-            localStorage.setItem('gemini_key_index', idx + 1);
-            procesarConIA(historialAEnviar, esBotonRapido);
-        }
+        } catch (e) { localStorage.setItem('gemini_key_index', idx + 1); procesarConIA(historialAEnviar, esBotonRapido); }
     }
-
-    function convertirMarkdownAModal(t) {
-        return t.replace(/^### (.*$)/gim, '<h3 style="color:#002f80; font-size:14px; margin:10px 0;">$1</h3>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-    }
+    function convertirMarkdownAModal(t) { return t.replace(/^### (.*$)/gim, '<h3 style="color:#002f80; font-size:14px; margin:10px 0;">$1</h3>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>'); }
 
     init();
 </script>
