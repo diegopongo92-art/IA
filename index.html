@@ -128,7 +128,10 @@
         <p><strong>🔗 2. Hilos Conductores:</strong> Conecta esto con antecedentes de la gestión (Vía Expresa Sur, peajes, etc).</p>
         <p><strong>⚠️ 3. Alerta de Flanco Débil:</strong> ¿Cuál es el flanco institucional más vulnerable para las próximas 48 horas?</p>
         `;
-
+        
+const payload = {
+            contents: [{ parts: [{ text: promptMaestro }] }]
+        };
 
         try {
             const response = await fetch(url, {
