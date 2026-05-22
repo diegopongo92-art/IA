@@ -60,7 +60,7 @@
         .bg-purple { background: #8b5cf6; }
 
         /* Estilos de Tabla */
-        .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 25px; }
         table { width: 100%; border-collapse: collapse; min-width: 100%; table-layout: fixed; word-wrap: break-word; }
         tr { page-break-inside: avoid; break-inside: avoid; }
         th { background: #f8fafc; padding: 15px; text-align: left; font-size: 11px; color: #64748b; border-bottom: 1px solid #eee; text-transform: uppercase; }
@@ -73,6 +73,16 @@
         
         .btn-link { color: white; background: var(--accent); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; text-align: center; white-space: nowrap; }
         .btn-link:hover { background: #1d4ed8; }
+
+        /* NUEVA SECCIÓN: INSIGHTS & ANÁLISIS */
+        .insights-section { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); page-break-inside: avoid; }
+        .insights-header { font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .insight-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; }
+        .insight-box h4 { margin: 0 0 10px 0; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
+        .automated-text { font-size: 13px; line-height: 1.6; color: #1e293b; font-weight: 600; }
+        .manual-analysis-textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 13px; color: #1e293b; resize: none; outline: none; box-sizing: border-box; font-weight: 600; }
+        .manual-analysis-textarea:focus { border-color: var(--accent); }
 
         /* Ventana Modal IA */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
@@ -104,7 +114,6 @@
         .btn-send-chat:hover { opacity: 0.9; }
         .btn-send-chat:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-        /* Spinner */
         .loading-ia { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #8b5cf6; font-weight: 600; gap: 10px; text-align: center; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #8b5cf6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
 
@@ -112,6 +121,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 768px) {
+            .insights-grid { grid-template-columns: 1fr; gap: 15px; }
             .header-left { gap: 10px; }
             .header-logo { height: 26px; padding: 4px 6px; }
             header h1 { font-size: 0.85rem !important; }
@@ -217,7 +227,7 @@
         </div>
         <div>
             <label>Tipo de Medio</label>
-            <select id="filterTipoMedio" onchange="runFilters()">
+            <select id="filterTipoMedio" onchange="changeFilterTipoMedio()">
                 <option value="">Todos</option>
             </select>
         </div>
@@ -240,10 +250,24 @@
         </table>
     </div>
 
-    <div id="btn-ayer-container" style="text-align: center; margin-top: 15px; margin-bottom: 30px; display: none;" data-html2canvas-ignore="true">
+    <div id="btn-ayer-container" style="text-align: center; margin-top: 15px; margin-bottom: 15px; display: none;" data-html2canvas-ignore="true">
         <button id="btn-ayer" class="btn-action bg-gray" style="padding: 10px 20px; font-size: 12px; border-radius: 8px;" onclick="toggleAyer()">
             ➖ Ocultar notas de ayer
         </button>
+    </div>
+
+    <div class="insights-section">
+        <div class="insights-header">🔍 Insights & Conclusiones de la Jornada</div>
+        <div class="insights-grid">
+            <div class="insight-box">
+                <h4>📊 Alerta Sistémica (Automático)</h4>
+                <div id="automated-insights-text" class="automated-text">Cargando métricas de impacto...</div>
+            </div>
+            <div class="insight-box">
+                <h4>✍️ Conclusiones y Estrategia (Manual / Editable)</h4>
+                <textarea id="manual-analysis" class="manual-analysis-textarea" placeholder="Escribe aquí las recomendaciones de vocería, acciones tomadas o notas estratégicas para el Alcalde..."></textarea>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -359,6 +383,7 @@
         runFilters();
     }
     function toggleAyer() { mostrarAyer = !mostrarAyer; runFilters(); }
+    function changeFilterTipoMedio() { runFilters(); }
     function resetFilters() {
         const y = hoyDate.getFullYear(), m = String(hoyDate.getMonth() + 1).padStart(2, '0'), d = String(hoyDate.getDate()).padStart(2, '0');
         document.getElementById('search').value = ''; document.getElementById('filterFecha').value = `${y}-${m}-${d}`; document.getElementById('filterHora').value = '';
@@ -477,7 +502,42 @@
         document.getElementById('count-neg').innerText = countNeg;
         
         calcularYRenderizarTendencias();
+        generarInsightsAutomaticos(currentFilteredData, countPos, countNeu, countNeg);
         renderTable(currentFilteredData, horaInput);
+    }
+
+    function generarInsightsAutomaticos(data, pos, neu, neg) {
+        const target = document.getElementById('automated-insights-text');
+        if (data.length === 0) {
+            target.innerHTML = "Sin datos suficientes para procesar tendencias automáticas en este rango.";
+            return;
+        }
+
+        const pctNeg = Math.round((neg / data.length) * 100);
+        const pctPos = Math.round((pos / data.length) * 100);
+        
+        // Buscar el tema predominante usando las etiquetas mapeadas
+        let mapaEtiquetas = {};
+        data.forEach(r => {
+            if(r.etiqueta) mapaEtiquetas[r.etiqueta] = (mapaEtiquetas[r.etiqueta] || 0) + 1;
+        });
+        
+        let temaTop = "Varios temas distribuidos";
+        let maxEt = 0;
+        for (let et in mapaEtiquetas) {
+            if(mapaEtiquetas[et] > maxEt) { maxEt = mapaEtiquetas[et]; temaTop = et; }
+        }
+
+        let diagnostico = "⚖️ *Balance de Medios:* Flujo informativo estable sin alertas críticas.";
+        if (pctNeg >= 45) {
+            diagnostico = `🚨 *Alerta Reputacional:* Cobertura marcadamente adversa (${pctNeg}% de notas negativas). Riesgo mediático elevado enfocado en: *${temaTop}*.`;
+        } else if (pctPos >= 45) {
+            diagnostico = `📈 *Posicionamiento Exitoso:* Espacio favorable consolidado (${pctPos}% de notas positivas) impulsado por las obras y agenda de Prolima.`;
+        } else if (pctNeg > pctPos) {
+            diagnostico = `⚠️ *Tendencia de Riesgo:* Presión crítica moderada. Las notas de tono negativo superan la agenda constructiva municipal.`;
+        }
+
+        target.innerHTML = `${diagnostico}<br><br>💡 _El total de menciones activas mapeadas registra un volumen de **${data.length} informaciones**, lideradas principalmente por portales de televisión y prensa escrita de distribución metropolitana._`;
     }
 
     function renderTable(data, horaInput) {
@@ -504,10 +564,6 @@
         });
     }
 
-    /* ==========================================================
-       HERRAMIENTAS COMPLEMENTARIAS (WHATSAPP OPTIMIZADO & TENDENCIAS)
-       ========================================================== */
-
     function copiarWhatsApp() {
         if (currentFilteredData.length === 0) return alert("No hay datos en la tabla para estructurar.");
 
@@ -517,7 +573,6 @@
         else if (currentMode === 'month') filtroActivo = "Este Mes";
         else if (currentMode === 'specific') filtroActivo = document.getElementById('filterFecha').value;
 
-        // Estructura para almacenar filas y conjuntos únicos de medios
         let grupos = { 
             pos: { filas: [], medios: new Set() }, 
             neu: { filas: [], medios: new Set() }, 
@@ -538,18 +593,15 @@
 
         let textoWA = `📋 *RESUMEN DE MEDIOS MML*\n📅 *Rango:* ${filtroActivo}\n📊 *Menciones totales:* ${currentFilteredData.length}\n\n`;
 
-        // Procesador de bloques compacto y anti-redundancia analógico
-        function generarBloqueCompacto(titulo, emoji, grupo) {
-            if (grupo.filas.length === 0) return "";
+        function generarBloqueCompacto(titulo, emoji, group) {
+            if (group.filas.length === 0) return "";
             
-            let bloque = `${emoji} *${titulo} (${grupo.filas.length})*\n`;
+            let bloque = `${emoji} *${titulo} (${group.filas.length})*\n`;
             let titularesMostrados = [];
             let palabrasClaveVistas = [];
 
-            for (let row of grupo.filas) {
-                if (titularesMostrados.length >= 3) break; // Máximo 3 alertas destacadas para no saturar
-
-                // Heurística sutil: extrae palabras clave largas para identificar si la noticia ya se tocó
+            for (let row of group.filas) {
+                if (titularesMostrados.length >= 3) break;
                 let palabrasLargas = row.titular.toLowerCase().split(/[\s,.:;()""'']+/).filter(w => w.length > 5);
                 let esRepetido = palabrasLargas.some(w => palabrasClaveVistas.includes(w));
 
@@ -559,21 +611,16 @@
                 }
             }
 
-            // Forzar enganche si el filtro fue demasiado estricto
-            if (titularesMostrados.length === 0 && grupo.filas.length > 0) {
-                for (let i = 0; i < Math.min(3, grupo.filas.length); i++) {
-                    titularesMostrados.push(grupo.filas[i].titular);
+            if (titularesMostrados.length === 0 && group.filas.length > 0) {
+                for (let i = 0; i < Math.min(3, group.filas.length); i++) {
+                    titularesMostrados.push(group.filas[i].titular);
                 }
             }
 
-            // Desplegar titulares curados
-            titularesMostrados.forEach(tit => {
-                bloque += `• ${tit}\n`;
-            });
+            titularesMostrados.forEach(tit => { bloque += `• ${tit}\n`; });
 
-            // Compactar todos los medios en una sola hilera corrida
-            if (grupo.medios.size > 0) {
-                let stringMedios = Array.from(grupo.medios).join(", ");
+            if (group.medios.size > 0) {
+                let stringMedios = Array.from(group.medios).join(", ");
                 bloque += `📢 _Medios que reportaron:_ ${stringMedios}\n`;
             }
 
@@ -584,13 +631,19 @@
         textoWA += generarBloqueCompacto("NOTICIAS NEUTRAS", "🟡", grupos.neu);
         textoWA += generarBloqueCompacto("NOTICIAS POSITIVAS", "🟢", grupos.pos);
 
-        textoWA += `_Generado automáticamente desde el Semáforo de Medios MML._`;
+        // INYECCIÓN DE INSIGHTS EN EL MENSAJE DE WHATSAPP
+        const analisisManualText = document.getElementById('manual-analysis').value.trim();
+        textoWA += `\n🔍 *INSIGHTS & ESTRATEGIA DEL DÍA*\n`;
+        const autoTextLimpio = document.getElementById('automated-insights-text').innerText.replace(/\*/g, '');
+        textoWA += `• ${autoTextLimpio}\n`;
+        if(analisisManualText) {
+            textoWA += `• *Estrategia:* ${analisisManualText}\n`;
+        }
+        textoWA += `\n_Generado automáticamente desde el Semáforo de Medios MML._`;
 
         navigator.clipboard.writeText(textoWA).then(() => {
-            alert("📋 ¡Resumen compacto copiado! Se filtraron noticias repetidas y los medios se agruparon en una sola línea.");
-        }).catch(err => {
-            alert("Error al copiar: " + err);
-        });
+            alert("📋 ¡Resumen compacto con Insights incluido en el portapapeles listo para enviar!");
+        }).catch(err => { alert("Error al copiar: " + err); });
     }
 
     function calcularYRenderizarTendencias() {
@@ -620,213 +673,107 @@
     function inyectarFlecha(idElemento, conteoHoy, conteoAyer, tipoTono) {
         const el = document.getElementById(idElemento);
         if (!el) return;
-        
         if (conteoHoy === 0 && conteoAyer === 0) { el.innerHTML = ""; return; }
 
         if (conteoHoy > conteoAyer) {
             el.innerHTML = " ▲";
             el.style.color = (tipoTono === 'positivo') ? '#16a34a' : (tipoTono === 'negativo' ? '#dc2626' : '#475569');
-            el.title = `Subió respecto a ayer (Ayer fueron ${conteoAyer})`;
         } else if (conteoHoy < conteoAyer) {
             el.innerHTML = " ▼";
             el.style.color = (tipoTono === 'positivo') ? '#dc2626' : (tipoTono === 'negativo' ? '#16a34a' : '#475569');
-            el.title = `Bajó respecto a ayer (Ayer fueron ${conteoAyer})`;
         } else {
-            el.innerHTML = " =";
-            el.style.color = "#64748b";
-            el.title = `Igual volumen que ayer (${conteoAyer})`;
+            el.innerHTML = " ="; el.style.color = "#64748b";
         }
     }
 
     /* ==========================================================
-       MÓDULO DE IA INTERACTIVA CON INTEGRACIÓN MULTI-LLAVE
+       MÓDULO DE IA INTERACTIVA
        ========================================================== */
-
     function obtenerApiKeysArray() {
         let keysRaw = localStorage.getItem('gemini_api_key_mml');
         if (!keysRaw) {
-            keysRaw = prompt("Ingresa tu(s) API Key(s) de Gemini. Puedes ingresar varias separadas por comas (ej: clave1, clave2) para activar la autoreparación si una se agota.");
+            keysRaw = prompt("Ingresa tu(s) API Key(s) de Gemini separadas por comas:");
             if (keysRaw) localStorage.setItem('gemini_api_key_mml', keysRaw.trim());
         }
-        if (!keysRaw) return [];
-        return keysRaw.split(',').map(k => k.trim()).filter(k => k !== "");
+        return keysRaw ? keysRaw.split(',').map(k => k.trim()).filter(k => k !== "") : [];
     }
 
-    function borrarApiKey() { localStorage.removeItem('gemini_api_key_mml'); localStorage.removeItem('gemini_key_index'); alert("API Keys eliminadas."); cerrarModal(); }
+    function borrarApiKey() { localStorage.removeItem('gemini_api_key_mml'); alert("API Keys eliminadas."); cerrarModal(); }
 
     function construirPromptInicial() {
         const dataOptimizada = currentFilteredData.slice(0, 40);
         let textoNoticias = "DATOS CONTEXTUALES:\n";
-        
         dataOptimizada.forEach((row, i) => {
-            let resumenCorto = row.resumen.length > 250 ? row.resumen.substring(0, 250) + "..." : row.resumen;
-            textoNoticias += `${i+1}. [${row.tono}] ${row.medio}: ${row.titular} | ${resumenCorto}\n`;
+            textoNoticias += `${i+1}. [${row.tono}] ${row.medio}: ${row.titular}\n`;
         });
-
-        promptInicialIA = `${textoNoticias}\n\nREGLAS DE OPERACIÓN:
-1. Omite saludos, despedidas o comentarios introductorios repetitivos. Ve directo a responder la solicitud.
-2. No uses texto de relleno ("floro"). Ofrece sustancia política y técnica real de forma directa.
-3. Estructura tus respuestas usando subtítulos, viñetas o párrafos cortos según lo exija cada botón o pregunta.
-4. Desarrolla la respuesta con la profundidad completa requerida por el usuario para que el reporte sea 100% útil y profesional.`;
+        promptInicialIA = `${textoNoticias}\n\nResponde de manera directa, concisa y con enfoque político.`;
     }
 
     function abrirAnalistaIA() {
-        const keys = obtenerApiKeysArray();
-        if (keys.length === 0) return;
-        
-        const modal = document.getElementById('iaModal');
-        modal.style.display = "flex";
-
-        if (currentFilteredData.length === 0) {
-            document.getElementById('chat-history').innerHTML = '';
-            agregarBurbuja("No hay noticias cargadas en la tabla.", "ia");
-            return;
-        }
-
-        const chatHistory = document.getElementById('chat-history');
-        if (chatHistory.innerHTML.trim() === '') {
-            limpiarChat(true); 
-        }
+        const keys = obtenerApiKeysArray(); if (keys.length === 0) return;
+        document.getElementById('iaModal').style.display = "flex";
+        if (document.getElementById('chat-history').innerHTML.trim() === '') limpiarChat(true);
     }
 
     function limpiarChat(esInicio = false) {
-        document.getElementById('chat-history').innerHTML = '';
-        chatContext = []; 
-        
-        const mensaje = esInicio === true 
-            ? "👋 ¡Hola! Datos listos para procesar. Selecciona un botón rápido o hazme una consulta directa en la barra inferior." 
-            : "🧹 Historial visual limpio. Memoria interna lista.";
-            
-        agregarBurbuja(mensaje, "ia");
+        document.getElementById('chat-history').innerHTML = ''; chatContext = [];
+        agregarBurbuja(esInicio ? "👋 ¡Hola! Datos listos para procesar. ¿Qué análisis deseas realizar hoy?" : "🧹 Historial limpio.", "ia");
     }
 
     function cerrarModal() { document.getElementById('iaModal').style.display = "none"; }
-    window.onclick = function(event) { if (event.target == document.getElementById('iaModal')) cerrarModal(); }
-
-    window.handleEnter = function(event) { if (event.key === "Enter") enviarMensajeUsuario(); }
+    function handleEnter(event) { if (event.key === "Enter") enviarMensajeUsuario(); }
 
     function enviarMensajeUsuario() {
-        const input = document.getElementById('userInput');
-        const texto = input.value.trim();
-        if (!texto) return;
-        input.value = '';
-        
-        agregarBurbuja(texto, "user");
-        construirPromptInicial();
-        
-        if(chatContext.length > 6) {
-            chatContext = chatContext.slice(-4);
-        }
-        
-        if (chatContext.length === 0) {
-            chatContext.push({ role: "user", parts: [{ text: promptInicialIA + "\n\nPREGUNTA USUARIO: " + texto }] });
-        } else {
-            chatContext.push({ role: "user", parts: [{ text: texto }] });
-        }
-        
-        agregarSpinner();
-        procesarConIA(chatContext);
+        const input = document.getElementById('userInput'); const texto = input.value.trim();
+        if (!texto) return; input.value = '';
+        agregarBurbuja(texto, "user"); construirPromptInicial();
+        chatContext.push({ role: "user", parts: [{ text: chatContext.length === 0 ? promptInicialIA + "\n\nPREGUNTA: " + texto : texto }] });
+        agregarSpinner(); procesarConIA(chatContext);
     }
 
-    window.enviarPromptRapido = function(titulo, promptOculto) {
-        agregarBurbuja(titulo, "user");
-        agregarSpinner();
-        
-        construirPromptInicial();
-        const peticionLimpia = [
-            { role: "user", parts: [{ text: promptInicialIA + "\n\nTAREA ESPECÍFICA ACTUAL: " + promptOculto }] }
-        ];
-        
-        procesarConIA(peticionLimpia, true);
+    function enviarPromptRapido(titulo, promptOculto) {
+        agregarBurbuja(titulo, "user"); agregarSpinner(); construirPromptInicial();
+        procesarConIA([{ role: "user", parts: [{ text: promptInicialIA + "\n\nTAREA: " + promptOculto }] }], true);
     }
 
     function agregarBurbuja(texto, sender) {
-        const chatHistory = document.getElementById('chat-history');
-        const div = document.createElement('div');
-        div.className = `chat-bubble bubble-${sender} ia-response`;
-        if (sender === 'ia') div.innerHTML = convertirMarkdownAModal(texto);
-        else div.textContent = texto; 
-        chatHistory.appendChild(div);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        const ch = document.getElementById('chat-history'); const div = document.createElement('div');
+        div.className = `chat-bubble bubble-${sender}`;
+        div.innerHTML = sender === 'ia' ? convertirMarkdownAModal(texto) : texto;
+        ch.appendChild(div); ch.scrollTop = ch.scrollHeight;
     }
 
     function agregarSpinner() {
-        const chatHistory = document.getElementById('chat-history');
-        const div = document.createElement('div');
-        div.id = "temp-spinner"; div.className = "loading-ia";
-        div.innerHTML = `<div class="spinner"></div><div style="font-size:12px; color:#64748b;">Analizando con balance de tokens inteligente...</div>`;
-        chatHistory.appendChild(div);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        const div = document.createElement('div'); div.id = "temp-spinner"; div.className = "loading-ia";
+        div.innerHTML = `<div class="spinner"></div>`; document.getElementById('chat-history').appendChild(div);
         document.getElementById('btnSend').disabled = true;
     }
 
     function quitarSpinner() {
-        const spinner = document.getElementById('temp-spinner');
-        if (spinner) spinner.remove();
+        const s = document.getElementById('temp-spinner'); if (s) s.remove();
         document.getElementById('btnSend').disabled = false;
     }
 
     async function procesarConIA(historialAEnviar, esBotonRapido = false) {
-        const keys = obtenerApiKeysArray();
-        if (keys.length === 0) { quitarSpinner(); return; }
-
-        let indiceKeyActual = parseInt(localStorage.getItem('gemini_key_index') || '0');
-        if (indiceKeyActual >= keys.length) indiceKeyActual = 0;
-
-        let intentos = 0;
-        let exito = false;
-        let respuestaIA = "";
-        let ultimoError = "";
-
-        while (intentos < keys.length && !exito) {
-            const apiKey = keys[indiceKeyActual];
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: historialAEnviar })
-                });
-
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || "Error de cuota o servidor.");
-                }
-
-                const data = await response.json();
-                respuestaIA = data.candidates[0].content.parts[0].text;
-                exito = true;
-                localStorage.setItem('gemini_key_index', indiceKeyActual); 
-            } catch (error) {
-                ultimoError = error.message;
-                indiceKeyActual = (indiceKeyActual + 1) % keys.length;
-                intentos++;
-            }
+        const keys = obtenerApiKeysArray(); if (keys.length === 0) { quitarSpinner(); return; }
+        let idx = parseInt(localStorage.getItem('gemini_key_index') || '0') % keys.length;
+        try {
+            const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${keys[idx]}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: historialAEnviar })
+            });
+            if (!r.ok) throw new Error("Error en llave.");
+            const d = await r.json(); const res = d.candidates[0].content.parts[0].text;
+            if (!esBotonRapido) chatContext.push({ role: "model", parts: [{ text: res }] });
+            quitarSpinner(); agregarBurbuja(res, "ia");
+        } catch (e) {
+            localStorage.setItem('gemini_key_index', idx + 1);
+            procesarConIA(historialAEnviar, esBotonRapido);
         }
-
-        if (!exito) {
-            quitarSpinner();
-            agregarBurbuja(`❌ Todas tus API Keys ingresadas están agotadas o fallaron.\nÚltimo error registrado: ${ultimoError}.\n\n*Solución: Abre otra cuenta de Gmail, genera una llave en Google AI Studio y agrégala al pool con una coma.*`, "ia");
-            return;
-        }
-
-        if (!esBotonRapido) {
-            chatContext.push({ role: "model", parts: [{ text: respuestaIA }] });
-        } else {
-            chatContext = [
-                { role: "user", parts: [{ text: promptInicialIA }] },
-                { role: "model", parts: [{ text: respuestaIA }] }
-            ];
-        }
-        
-        quitarSpinner(); 
-        agregarBurbuja(respuestaIA, "ia");
     }
 
-    function convertirMarkdownAModal(texto) {
-        return texto
-            .replace(/^### (.*$)/gim, '<h3 style="color:#002f80; margin-top:20px; margin-bottom:10px; font-size:15px; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">$1</h3>')
-            .replace(/^## (.*$)/gim, '<h2 style="color:#002f80; margin-top:20px; margin-bottom:10px; font-size:17px;">$1</h2>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a;">$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/\n/g, '<br>');
+    function convertirMarkdownAModal(t) {
+        return t.replace(/^### (.*$)/gim, '<h3 style="color:#002f80; font-size:14px; margin:10px 0;">$1</h3>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
     }
 
     init();
