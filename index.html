@@ -500,7 +500,7 @@
 
     function construirPromptInicial() {
         // OPTIMIZACIÓN: Solo tomamos las primeras 60 notas para no saturar los tokens
-        const dataOptimizada = currentFilteredData.slice(0, 200);
+        const dataOptimizada = currentFilteredData.slice(0, 60);
         let textoNoticias = `BASE DE DATOS ACTUAL A ANALIZAR (Muestra de ${dataOptimizada.length} notas relevantes):\n\n`;
         
         dataOptimizada.forEach((row, index) => {
