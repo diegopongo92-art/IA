@@ -129,10 +129,6 @@
         <p><strong>⚠️ 3. Alerta de Flanco Débil:</strong> ¿Cuál es el flanco institucional más vulnerable para las próximas 48 horas?</p>
         `;
 
-        const payload = {
-            contents: [{ parts: [{ text: promptMaestro }] }],
-            tools: [{ googleSearch: {} }] // <-- ¡CORREGIDO! Nombre oficial aceptado por Google
-        };
 
         try {
             const response = await fetch(url, {
