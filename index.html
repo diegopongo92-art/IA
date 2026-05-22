@@ -73,7 +73,7 @@
         /* Animación para el indicador de IA */
         @keyframes pulsoIA {
             0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.1); }
+            50% { opacity: 0.4; transform: scale(1.05); }
             100% { opacity: 1; transform: scale(1); }
         }
 
@@ -238,7 +238,6 @@
     let currentMode = 'hoy'; 
     let mostrarAyer = true; 
 
-    // Controlador interno para evitar colisiones en llamadas asíncronas consecutivas de la IA
     let controlTokenIA = 0;
 
     async function init() {
@@ -351,7 +350,6 @@
         runFilters();
     }
 
-    /* OJO: Esta función altera el estado global de filtrado */
     function toggleAyer() {
         mostrarAyer = !mostrarAyer;
         runFilters();
@@ -566,7 +564,6 @@
 
         renderTable(finalFiltered, horaInput);
 
-        // 🤖 LLAMADA AUTOMÁTICA DE IA: Analiza el subconjunto de datos filtrados exactos
         ejecutarAnalisisIAConFiltros(finalFiltered);
     }
 
@@ -643,7 +640,7 @@
         });
     }
 
-    // 🤖 LÓGICA DE INTELIGENCIA ARTIFICIAL GEMINI INTEGRADA EN TIEMPO REAL
+    // 🤖 LÓGICA DE IA CON SISTEMA AUTO-DETECT REFORZADO (SIN ERRORES)
     async function ejecutarAnalisisIAConFiltros(noticiasFiltradas) {
         controlTokenIA++;
         const tokenActual = controlTokenIA;
@@ -657,23 +654,43 @@
             return;
         }
 
-        // Activamos animación de escaneo
         pulso.style.animation = 'pulsoIA 1s infinite';
-        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Analizando ${noticiasFiltradas.length} menciones vigentes... Evaluando principales focos, tendencias e impacto político...</span>`;
+        cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Interrogando servidor de Google y auto-detectando modelo activo...</span>`;
 
-        // Compilar un extracto compacto de las noticias para enviárselas al motor de IA
-        const resumenCoyuntura = noticiasFiltradas.slice(0, 45).map((n, idx) => {
-            return `[${idx+1}] (${n.tono}) Medio: ${n.medio} | Titulo: ${n.titular} | Resumen: ${n.resumen}`;
-        }).join("\n");
-
-        // Token de conexión API autodetectable
         const sPart1 = "AIzaSyC3SyvPVlkPo8";
         const sPart2 = "CLI76vdgCnDFkbTbJ03-4";
         const apiKey = sPart1 + sPart2;
 
         try {
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            // PASO 1: Descubrir qué nombres de modelos tiene permitidos la API key en este momento
+            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+            const listResponse = await fetch(listUrl);
+            const listData = await listResponse.json();
+
+            if (!listData.models) throw new Error("No se pudo obtener la lista interna del servidor.");
+
+            const modelosValidos = listData.models.filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"));
+            if (modelosValidos.length === 0) throw new Error("El token no cuenta con modelos de generación activos.");
+
+            // Prioridad de autodetección (Flash -> Pro -> Primer disponible)
+            let modeloElegido = "";
+            const modeloFlash = modelosValidos.find(m => m.name.includes("gemini-1.5-flash"));
+            const modeloPro = modelosValidos.find(m => m.name.includes("gemini-1.5-pro"));
             
+            if (modeloFlash) modeloElegido = modeloFlash.name;
+            else if (modeloPro) modeloElegido = modeloPro.name;
+            else modeloElegido = modelosValidos[0].name;
+
+            if (tokenActual !== controlTokenIA) return;
+            cajaIA.innerHTML = `<span style="color: var(--accent); font-weight: 700;">🤖 Modelo [${modeloElegido.split('/').pop()}] enlazado. Procesando impacto político de las ${noticiasFiltradas.length} menciones vigentes...</span>`;
+
+            // PASO 2: Construir el endpoint definitivo con el nombre real que devolvió Google
+            const endpointDefinitivo = `https://generativelanguage.googleapis.com/v1beta/${modeloElegido}:generateContent?key=${apiKey}`;
+
+            const resumenCoyuntura = noticiasFiltradas.slice(0, 45).map((n, idx) => {
+                return `[${idx+1}] (${n.tono}) Medio: ${n.medio} | Titulo: ${n.titular} | Resumen: ${n.resumen}`;
+            }).join("\n");
+
             const prompt = `Actúa como un Analista Político Experto especializado en la gestión pública de la Municipalidad Metropolitana de Lima (MML). Analiza el siguiente set de noticias extraídas del semáforo de medios institucional y genera un informe de coyuntura sumamente sintético y ejecutivo estructurado exactamente así:
             
             1. **DIAGNÓSTICO EXPRESS**: Un párrafo corto de máximo 3 líneas resumiendo el balance de la agenda del día o periodo seleccionado, identificando los temas centrales dominantes.
@@ -684,25 +701,23 @@
             
             Aquí están los datos vigentes para el análisis de coyuntura:\n${resumenCoyuntura}`;
 
-            const response = await fetch(endpoint, {
+            const response = await fetch(endpointDefinitivo, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
 
-            if (!response.ok) throw new Error("Fallo en la comunicación con el motor inteligente.");
+            if (!response.ok) throw new Error("Fallo en la comunicación en el bloque final de generación.");
 
             const jsonResponse = await response.json();
             const textoCrudoIA = jsonResponse.candidates[0].content.parts[0].text;
 
-            // Verificar si el usuario cambió los filtros mientras la IA respondía para no sobreescribir con datos desfasados
             if (tokenActual !== controlTokenIA) return;
 
-            // Renderizar la respuesta Markdown limpia en formato HTML compatible con tu Inter UI
             cajaIA.innerHTML = procesarMarkdownAI(textoCrudoIA);
         } catch (err) {
             if (tokenActual === controlTokenIA) {
-                cajaIA.innerHTML = `<span style="color: #ef4444; font-weight: 600;">⚠️ Nota del sistema: No se pudo generar el análisis automatizado en este instante (${err.message}). Revisa tu conexión a internet.</span>`;
+                cajaIA.innerHTML = `<span style="color: #ef4444; font-weight: 600;">⚠️ Nota del sistema: No se pudo generar el análisis automatizado en este instante (${err.message}). Por favor reintente cambiando de filtro.</span>`;
             }
         } finally {
             if (tokenActual === controlTokenIA) {
@@ -711,14 +726,12 @@
         }
     }
 
-    // Convertidor liviano integrado de Markdown a HTML para mantener las negritas y viñetas ejecutivas estables
     function procesarMarkdownAI(texto) {
         let html = texto
             .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a; font-weight:700;">$1</strong>')
             .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li style="margin-left:15px; margin-bottom:4px;">$1</li>')
             .replace(/\n/g, '<br>');
         
-        // Corregir posibles saltos de línea duplicados en las listas
         html = html.replace(/(<\/li><br>)/g, '</li>');
         return html;
     }
