@@ -122,7 +122,7 @@
 <div class="main" id="dashboard-content">
     
     <div class="actions-bar" data-html2canvas-ignore="true">
-        <button class="btn-extra btn-whatsapp" onclick="generarResumenWhatsApp()">📲 Resumen WhatsApp</button>
+        <button id="btn-whatsapp-resumen" class="btn-extra btn-whatsapp" onclick="generarResumenWhatsApp()">📋 Copiar Resumen</button>
         <button class="btn-extra btn-reset" onclick="resetFilters()">🔄 Restablecer Filtros</button>
         <button class="btn-extra btn-excel" onclick="downloadExcel()">📊 Descargar Excel</button>
         <button class="btn-extra btn-pdf" onclick="downloadPDF()">📄 Descargar PDF</button>
@@ -438,8 +438,43 @@
  
         const textoCompleto = lineas.join('\n') + '\n' + resumenFinal;
  
-        const urlWhatsApp = `https://wa.me/?text=${encodeURIComponent(textoCompleto)}`;
-        window.open(urlWhatsApp, '_blank');
+        // Copia el texto al portapapeles, sin redireccionar a ningún lado
+        copiarAlPortapapeles(textoCompleto);
+    }
+ 
+    function copiarAlPortapapeles(texto) {
+        const mostrarConfirmacion = () => {
+            const btn = document.getElementById('btn-whatsapp-resumen');
+            if (!btn) { alert("Resumen copiado ✅"); return; }
+            const original = btn.innerHTML;
+            btn.innerHTML = "✅ Copiado";
+            setTimeout(() => { btn.innerHTML = original; }, 1800);
+        };
+ 
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(texto).then(mostrarConfirmacion).catch(() => {
+                copiarFallback(texto, mostrarConfirmacion);
+            });
+        } else {
+            copiarFallback(texto, mostrarConfirmacion);
+        }
+    }
+ 
+    function copiarFallback(texto, callback) {
+        const textarea = document.createElement('textarea');
+        textarea.value = texto;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            if (callback) callback();
+        } catch (err) {
+            alert("No se pudo copiar automáticamente. Copia el texto manualmente:\n\n" + texto);
+        }
+        document.body.removeChild(textarea);
     }
     // ===== FIN NUEVO =====
  
