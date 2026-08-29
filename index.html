@@ -421,7 +421,7 @@
         if (t.includes('tv') || t.includes('televis')) return 'tv';
         if (t.includes('radio')) return 'radio';
         if (t.includes('web') || t.includes('digital') || t.includes('online') || t.includes('portal')) return 'web';
-        if (t.includes('prensa') || t.includes('diario') || t.includes('impres')) return 'prensa';
+        if (t.includes('diario') || t.includes('prensa') || t.includes('impres')) return 'diario';
         return t;
     }
 
@@ -432,31 +432,37 @@
         if (!url || !url.includes('http')) return url || 'Sin enlace';
         if (cacheLinksCortos[url]) return cacheLinksCortos[url];
 
-        // is.gd redirige directo al destino, sin página de confirmación intermedia
+        // Opción 1: cleanuri — redirige directo, sin página intermedia de aviso
         try {
-            const resp = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
+            const resp = await fetch('https://cleanuri.com/api/v1/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'url=' + encodeURIComponent(url)
+            });
             if (resp.ok) {
-                const corto = (await resp.text()).trim();
-                if (corto.startsWith('http') && !corto.toLowerCase().includes('error')) {
-                    cacheLinksCortos[url] = corto;
-                    return corto;
+                const data = await resp.json();
+                if (data && data.result_url) {
+                    cacheLinksCortos[url] = data.result_url;
+                    return data.result_url;
                 }
             }
         } catch (e) { /* seguimos al respaldo */ }
 
-        // Respaldo: TinyURL (puede mostrar una página de aviso la primera vez)
+        // Opción 2 (respaldo): is.gd — también redirige directo, sin interstitial
         try {
-            const resp2 = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
+            const resp2 = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
             if (resp2.ok) {
                 const corto2 = (await resp2.text()).trim();
-                if (corto2.startsWith('http')) {
+                if (corto2.startsWith('http') && !corto2.toLowerCase().includes('error')) {
                     cacheLinksCortos[url] = corto2;
                     return corto2;
                 }
             }
         } catch (e) { /* seguimos al respaldo final */ }
 
-        // Si ambos servicios fallan, se usa el link original
+        // Nota: NO se usa TinyURL porque sus links generados por API muestran
+        // una página de aviso antes de redirigir. Si ambos servicios de arriba
+        // fallan, se conserva el link original tal cual.
         return url;
     }
 
@@ -482,7 +488,7 @@
         const linksUnicos = [...new Set(currentFilteredData.map(r => r.link).filter(l => l && l.includes('http')))];
         await Promise.all(linksUnicos.map(url => acortarLink(url)));
 
-        // Armar el texto, bloque por etiqueta, con su propio resumen de tono y de canales
+        // Armar el texto, bloque por etiqueta: primero el resumen y la difusión, luego las noticias
         const bloques = Object.keys(grupos).sort().map(etiqueta => {
             const notasGrupo = grupos[etiqueta];
 
@@ -506,22 +512,22 @@
             });
 
             // Conteo de difusión por tipo de canal para este grupo
-            let gTv = 0, gWeb = 0, gRadio = 0, gPrensa = 0, gOtro = 0;
+            let gTv = 0, gWeb = 0, gRadio = 0, gDiario = 0, gOtro = 0;
             notasGrupo.forEach(row => {
                 const tipo = getTipoAbreviado(row.tipoMedio);
                 if (tipo === 'tv') gTv++;
                 else if (tipo === 'web') gWeb++;
                 else if (tipo === 'radio') gRadio++;
-                else if (tipo === 'prensa') gPrensa++;
+                else if (tipo === 'diario') gDiario++;
                 else gOtro++;
             });
 
-            let difusionLine = `📡 Difusión: 📺 TV: ${gTv} | 🌐 Web: ${gWeb} | 📻 Radio: ${gRadio} | 📰 Prensa: ${gPrensa}`;
-            if (gOtro > 0) difusionLine += ` | ❓ Otros: ${gOtro}`;
+            let difusionLine = `TV: ${gTv} |Web: ${gWeb} |Radio: ${gRadio} |Diario: ${gDiario}`;
+            if (gOtro > 0) difusionLine += ` |Otros: ${gOtro}`;
 
-            const resumenGrupo = `📊 *RESUMEN (${etiqueta})*: ${notasGrupo.length} notas | 🟢 ${gPos} positivas | 🟡 ${gNeu} neutras | 🔴 ${gNeg} negativas\n${difusionLine}`;
+            const encabezado = `*${etiqueta}*\n📊 *RESUMEN*: ${notasGrupo.length} notas \n🟢 ${gPos} positivas \n🟡 ${gNeu} neutras \n🔴 ${gNeg} negativas\n${difusionLine}`;
 
-            return `*${etiqueta}*\n${lineas.join('\n')}\n\n${resumenGrupo}`;
+            return `${encabezado}\n${lineas.join('\n')}`;
         });
 
         // Conteo automático general por tono, calculado sobre todos los datos filtrados
@@ -535,21 +541,26 @@
         const total = currentFilteredData.length;
 
         // Conteo general de difusión por canal
-        let totTv = 0, totWeb = 0, totRadio = 0, totPrensa = 0, totOtro = 0;
+        let totTv = 0, totWeb = 0, totRadio = 0, totDiario = 0, totOtro = 0;
         currentFilteredData.forEach(row => {
             const tipo = getTipoAbreviado(row.tipoMedio);
             if (tipo === 'tv') totTv++;
             else if (tipo === 'web') totWeb++;
             else if (tipo === 'radio') totRadio++;
-            else if (tipo === 'prensa') totPrensa++;
+            else if (tipo === 'diario') totDiario++;
             else totOtro++;
         });
-        let difusionTotalLine = `📡 Difusión total: 📺 TV: ${totTv} | 🌐 Web: ${totWeb} | 📻 Radio: ${totRadio} | 📰 Prensa: ${totPrensa}`;
-        if (totOtro > 0) difusionTotalLine += ` | ❓ Otros: ${totOtro}`;
+        let difusionTotalLine = `TV: ${totTv} |Web: ${totWeb} |Radio: ${totRadio} |Diario: ${totDiario}`;
+        if (totOtro > 0) difusionTotalLine += ` |Otros: ${totOtro}`;
 
-        const resumenFinal = `📊 *RESUMEN GENERAL*: ${total} notas | 🟢 ${pos} positivas | 🟡 ${neu} neutras | 🔴 ${neg} negativas\n${difusionTotalLine}`;
-
-        const textoCompleto = bloques.join('\n\n') + '\n\n' + resumenFinal;
+        // El resumen general solo se agrega si hay más de una etiqueta en el grupo
+        let textoCompleto;
+        if (Object.keys(grupos).length > 1) {
+            const resumenFinal = `📊 *RESUMEN GENERAL*: ${total} notas \n🟢 ${pos} positivas \n🟡 ${neu} neutras \n🔴 ${neg} negativas\n${difusionTotalLine}`;
+            textoCompleto = resumenFinal + '\n\n' + bloques.join('\n\n');
+        } else {
+            textoCompleto = bloques.join('\n\n');
+        }
 
         // Mostrar la vista previa en pantalla, justo debajo de las tarjetas de resumen
         const previewBox = document.getElementById('resumen-preview');
