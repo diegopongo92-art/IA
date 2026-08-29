@@ -511,7 +511,21 @@
             } catch (e) { console.warn('Acortador acortar.link falló:', e); }
         }
 
-        // Opción 2: spoo.me — gratuito, sin registro, redirige directo (sin página de aviso)
+        // Opción 2: TinyURL — funciona en la mayoría de redes/navegadores.
+        // Nota: la primera vez que alguien abre un link nuevo creado por API,
+        // TinyURL puede mostrar una página de aviso de un segundo antes de redirigir.
+        try {
+            const resp = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
+            if (resp.ok) {
+                const corto = (await resp.text()).trim();
+                if (corto.startsWith('http')) {
+                    cacheLinksCortos[url] = corto;
+                    return corto;
+                }
+            }
+        } catch (e) { console.warn('Acortador TinyURL falló:', e); }
+
+        // Opción 3: spoo.me — gratuito, sin registro, redirige directo (sin página de aviso)
         try {
             const resp = await fetch('https://spoo.me/api/v1/shorten', {
                 method: 'POST',
@@ -527,7 +541,7 @@
             }
         } catch (e) { console.warn('Acortador spoo.me falló:', e); }
 
-        // Opción 3: cleanuri — redirige directo, sin página intermedia de aviso
+        // Opción 4: cleanuri — redirige directo, sin página intermedia de aviso
         try {
             const resp = await fetch('https://cleanuri.com/api/v1/shorten', {
                 method: 'POST',
@@ -543,7 +557,7 @@
             }
         } catch (e) { console.warn('Acortador cleanuri falló:', e); }
 
-        // Opción 4 (respaldo): is.gd — también redirige directo, sin interstitial
+        // Opción 5 (respaldo): is.gd — también redirige directo, sin interstitial
         try {
             const resp2 = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
             if (resp2.ok) {
