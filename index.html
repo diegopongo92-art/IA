@@ -123,6 +123,7 @@
     
     <div class="actions-bar" data-html2canvas-ignore="true">
         <button id="btn-whatsapp-resumen" class="btn-extra btn-whatsapp" onclick="generarResumenWhatsApp()">📋 Copiar Resumen</button>
+        <button class="btn-extra bg-gray" style="background:#8b5cf6;" onclick="toggleConfigAcortador()">⚙️ Acortador</button>
         <button class="btn-extra btn-reset" onclick="resetFilters()">🔄 Restablecer Filtros</button>
         <button class="btn-extra btn-excel" onclick="downloadExcel()">📊 Descargar Excel</button>
         <button class="btn-extra btn-pdf" onclick="downloadPDF()">📄 Descargar PDF</button>
@@ -145,6 +146,15 @@
             <div class="card-title"># Negativas</div>
             <div class="card-value" id="count-neg">0</div>
         </div>
+    </div>
+
+    <div id="config-acortador" style="display:none; background:white; border-radius:12px; border:1px solid #e2e8f0; padding:16px 20px; margin-bottom:20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" data-html2canvas-ignore="true">
+        <label>API Key de acortar.link (opcional — para que los links usen tu propio acortador)</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <input type="text" id="acortarlinkApiKey" placeholder="Pega aquí tu API Key de acortar.link" style="flex:1; min-width:220px;">
+            <button class="btn-action" style="background:#8b5cf6; padding:10px 16px;" onclick="guardarApiKeyAcortar()">Guardar</button>
+        </div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:8px;">La consigues en tu cuenta de acortar.link, en la sección de API. Si no la configuras, se usará automáticamente un acortador gratuito como respaldo (cleanuri / is.gd).</div>
     </div>
 
     <div id="resumen-preview" style="display:none; background:white; border-radius:12px; border:1px solid #e2e8f0; padding:20px 20px 20px 20px; margin-bottom:20px; white-space:pre-wrap; font-family: 'Menlo', 'Consolas', monospace; font-size:13px; line-height:1.7; position:relative; box-shadow: 0 2px 10px rgba(0,0,0,0.05);" data-html2canvas-ignore="true">
@@ -407,6 +417,43 @@
         });
     }
 
+    // ===== Configuración del acortador (acortar.link) =====
+    let acortarLinkApiKey = '';
+
+    async function cargarApiKeyAcortar() {
+        if (!window.storage) return;
+        try {
+            const result = await window.storage.get('acortarlink_apikey', false);
+            if (result && result.value) {
+                acortarLinkApiKey = result.value;
+                const input = document.getElementById('acortarlinkApiKey');
+                if (input) input.value = result.value;
+            }
+        } catch (e) { /* aún no hay una guardada */ }
+    }
+
+    async function guardarApiKeyAcortar() {
+        const input = document.getElementById('acortarlinkApiKey');
+        const key = input ? input.value.trim() : '';
+        acortarLinkApiKey = key;
+        if (!window.storage) {
+            alert('API Key lista para esta sesión (el guardado permanente no está disponible en este visor).');
+            return;
+        }
+        try {
+            const result = await window.storage.set('acortarlink_apikey', key, false);
+            if (result) alert('✅ API Key guardada. Los enlaces se acortarán con acortar.link a partir de ahora.');
+        } catch (e) {
+            alert('No se pudo guardar la API Key, pero quedó activa para esta sesión.');
+        }
+    }
+
+    function toggleConfigAcortador() {
+        const panel = document.getElementById('config-acortador');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+    // ===== FIN Configuración del acortador =====
+
     // ===== NUEVO: Resumen rápido de WhatsApp =====
     function getEmojiTono(tono) {
         const t = (tono || '').toLowerCase();
@@ -432,7 +479,22 @@
         if (!url || !url.includes('http')) return url || 'Sin enlace';
         if (cacheLinksCortos[url]) return cacheLinksCortos[url];
 
-        // Opción 1: cleanuri — redirige directo, sin página intermedia de aviso
+        // Opción 1: acortar.link (tu propio acortador), si configuraste la API Key
+        if (acortarLinkApiKey) {
+            try {
+                const resp = await fetch(`https://acortar.link/api/v2/action/shorten?url=${encodeURIComponent(url)}&api_key=${encodeURIComponent(acortarLinkApiKey)}&is_secret=false`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    const corto = data && (data.short_url || data.url || data.result);
+                    if (corto && typeof corto === 'string' && corto.startsWith('http')) {
+                        cacheLinksCortos[url] = corto;
+                        return corto;
+                    }
+                }
+            } catch (e) { /* seguimos al respaldo */ }
+        }
+
+        // Opción 2: cleanuri — redirige directo, sin página intermedia de aviso
         try {
             const resp = await fetch('https://cleanuri.com/api/v1/shorten', {
                 method: 'POST',
@@ -525,9 +587,9 @@
             let difusionLine = `TV: ${gTv} |Web: ${gWeb} |Radio: ${gRadio} |Diario: ${gDiario}`;
             if (gOtro > 0) difusionLine += ` |Otros: ${gOtro}`;
 
-            const encabezado = `*${etiqueta}*\n📊 *RESUMEN*: ${notasGrupo.length} notas \n🟢 ${gPos} positivas \n🟡 ${gNeu} neutras \n🔴 ${gNeg} negativas\n${difusionLine}`;
+            const encabezado = `*${etiqueta}*\n\n📊 *RESUMEN*: ${notasGrupo.length} notas \n🟢 ${gPos} positivas \n🟡 ${gNeu} neutras \n🔴 ${gNeg} negativas\n${difusionLine}`;
 
-            return `${encabezado}\n${lineas.join('\n')}`;
+            return `${encabezado}\n\n${lineas.join('\n')}`;
         });
 
         // Conteo automático general por tono, calculado sobre todos los datos filtrados
@@ -848,6 +910,7 @@
     }
 
     init();
+    cargarApiKeyAcortar();
 </script>
 </body>
 </html>
