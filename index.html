@@ -475,6 +475,23 @@
     // Cache simple para no acortar el mismo link dos veces en la misma sesión
     const cacheLinksCortos = {};
 
+    // Respaldo final: pasa por un proxy CORS público para evitar el bloqueo
+    // del navegador cuando el servicio de acortado no envía las cabeceras CORS necesarias.
+    async function acortarViaProxy(url) {
+        try {
+            const destino = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(destino)}`;
+            const resp = await fetch(proxyUrl);
+            if (resp.ok) {
+                const corto = (await resp.text()).trim();
+                if (corto.startsWith('http') && !corto.toLowerCase().includes('error')) {
+                    return corto;
+                }
+            }
+        } catch (e) { console.warn('Acortador (proxy is.gd) falló:', e); }
+        return null;
+    }
+
     async function acortarLink(url) {
         if (!url || !url.includes('http')) return url || 'Sin enlace';
         if (cacheLinksCortos[url]) return cacheLinksCortos[url];
@@ -491,7 +508,7 @@
                         return corto;
                     }
                 }
-            } catch (e) { /* seguimos al respaldo */ }
+            } catch (e) { console.warn('Acortador acortar.link falló:', e); }
         }
 
         // Opción 2: spoo.me — gratuito, sin registro, redirige directo (sin página de aviso)
@@ -508,7 +525,7 @@
                     return data.short_url;
                 }
             }
-        } catch (e) { /* seguimos al respaldo */ }
+        } catch (e) { console.warn('Acortador spoo.me falló:', e); }
 
         // Opción 3: cleanuri — redirige directo, sin página intermedia de aviso
         try {
@@ -524,7 +541,7 @@
                     return data.result_url;
                 }
             }
-        } catch (e) { /* seguimos al respaldo */ }
+        } catch (e) { console.warn('Acortador cleanuri falló:', e); }
 
         // Opción 4 (respaldo): is.gd — también redirige directo, sin interstitial
         try {
@@ -536,11 +553,20 @@
                     return corto2;
                 }
             }
-        } catch (e) { /* seguimos al respaldo final */ }
+        } catch (e) { console.warn('Acortador is.gd falló:', e); }
 
         // Nota: NO se usa TinyURL porque sus links generados por API muestran
-        // una página de aviso antes de redirigir. Si ambos servicios de arriba
-        // fallan, se conserva el link original tal cual.
+        // una página de aviso antes de redirigir.
+
+        // Último intento: si todo lo anterior falló por bloqueo de CORS del navegador,
+        // se prueba pasando por un proxy público que sí entrega las cabeceras CORS.
+        const viaProxy = await acortarViaProxy(url);
+        if (viaProxy) {
+            cacheLinksCortos[url] = viaProxy;
+            return viaProxy;
+        }
+
+        // Si absolutamente nada funcionó, se conserva el link original.
         return url;
     }
 
