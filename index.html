@@ -494,7 +494,23 @@
             } catch (e) { /* seguimos al respaldo */ }
         }
 
-        // Opción 2: cleanuri — redirige directo, sin página intermedia de aviso
+        // Opción 2: spoo.me — gratuito, sin registro, redirige directo (sin página de aviso)
+        try {
+            const resp = await fetch('https://spoo.me/api/v1/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ long_url: url })
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data && data.short_url) {
+                    cacheLinksCortos[url] = data.short_url;
+                    return data.short_url;
+                }
+            }
+        } catch (e) { /* seguimos al respaldo */ }
+
+        // Opción 3: cleanuri — redirige directo, sin página intermedia de aviso
         try {
             const resp = await fetch('https://cleanuri.com/api/v1/shorten', {
                 method: 'POST',
@@ -510,7 +526,7 @@
             }
         } catch (e) { /* seguimos al respaldo */ }
 
-        // Opción 2 (respaldo): is.gd — también redirige directo, sin interstitial
+        // Opción 4 (respaldo): is.gd — también redirige directo, sin interstitial
         try {
             const resp2 = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
             if (resp2.ok) {
@@ -549,6 +565,10 @@
         // Acortar todos los links únicos en paralelo
         const linksUnicos = [...new Set(currentFilteredData.map(r => r.link).filter(l => l && l.includes('http')))];
         await Promise.all(linksUnicos.map(url => acortarLink(url)));
+
+        // Verificar cuántos links realmente se lograron acortar (para avisar si ninguno funcionó)
+        const linksAcortados = linksUnicos.filter(url => cacheLinksCortos[url] && cacheLinksCortos[url] !== url);
+        const huboFalloTotal = linksUnicos.length > 0 && linksAcortados.length === 0;
 
         // Armar el texto, bloque por etiqueta: primero el resumen y la difusión, luego las noticias
         const bloques = Object.keys(grupos).sort().map(etiqueta => {
@@ -639,6 +659,10 @@
             btn.innerHTML = '✅ Copiado';
             btn.disabled = false;
             setTimeout(() => { btn.innerHTML = textoOriginalBtn; }, 1800);
+        }
+
+        if (huboFalloTotal) {
+            alert('⚠️ El resumen se copió, pero no se pudieron acortar los links automáticamente (posible bloqueo de tu red/navegador a los servicios de acortado). Se usaron los links originales.');
         }
     }
 
