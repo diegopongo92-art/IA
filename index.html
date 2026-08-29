@@ -431,19 +431,33 @@
     async function acortarLink(url) {
         if (!url || !url.includes('http')) return url || 'Sin enlace';
         if (cacheLinksCortos[url]) return cacheLinksCortos[url];
+
+        // is.gd redirige directo al destino, sin página de confirmación intermedia
         try {
-            const resp = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
-            if (!resp.ok) throw new Error('No se pudo acortar');
-            const corto = (await resp.text()).trim();
-            if (corto && corto.startsWith('http')) {
-                cacheLinksCortos[url] = corto;
-                return corto;
+            const resp = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(url));
+            if (resp.ok) {
+                const corto = (await resp.text()).trim();
+                if (corto.startsWith('http') && !corto.toLowerCase().includes('error')) {
+                    cacheLinksCortos[url] = corto;
+                    return corto;
+                }
             }
-            return url;
-        } catch (e) {
-            // Si el servicio de acortado falla (ej. sin internet o CORS), se usa el link original
-            return url;
-        }
+        } catch (e) { /* seguimos al respaldo */ }
+
+        // Respaldo: TinyURL (puede mostrar una página de aviso la primera vez)
+        try {
+            const resp2 = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
+            if (resp2.ok) {
+                const corto2 = (await resp2.text()).trim();
+                if (corto2.startsWith('http')) {
+                    cacheLinksCortos[url] = corto2;
+                    return corto2;
+                }
+            }
+        } catch (e) { /* seguimos al respaldo final */ }
+
+        // Si ambos servicios fallan, se usa el link original
+        return url;
     }
 
     async function generarResumenWhatsApp() {
@@ -468,9 +482,11 @@
         const linksUnicos = [...new Set(currentFilteredData.map(r => r.link).filter(l => l && l.includes('http')))];
         await Promise.all(linksUnicos.map(url => acortarLink(url)));
 
-        // Armar el texto, bloque por etiqueta
+        // Armar el texto, bloque por etiqueta, con su propio resumen de tono y de canales
         const bloques = Object.keys(grupos).sort().map(etiqueta => {
-            const lineas = grupos[etiqueta].map(row => {
+            const notasGrupo = grupos[etiqueta];
+
+            const lineas = notasGrupo.map(row => {
                 const emoji = getEmojiTono(row.tono);
                 const medio = (row.medio || 'MEDIO').toUpperCase();
                 const tipo = getTipoAbreviado(row.tipoMedio);
@@ -479,10 +495,36 @@
                     : 'Sin enlace';
                 return `${emoji} ${medio} (${tipo}): ${linkFinal}`;
             });
-            return `*${etiqueta}*\n${lineas.join('\n')}`;
+
+            // Conteo de tono para este grupo
+            let gPos = 0, gNeu = 0, gNeg = 0;
+            notasGrupo.forEach(row => {
+                const t = (row.tono || '').toLowerCase();
+                if (t.includes('pos')) gPos++;
+                else if (t.includes('neg')) gNeg++;
+                else gNeu++;
+            });
+
+            // Conteo de difusión por tipo de canal para este grupo
+            let gTv = 0, gWeb = 0, gRadio = 0, gPrensa = 0, gOtro = 0;
+            notasGrupo.forEach(row => {
+                const tipo = getTipoAbreviado(row.tipoMedio);
+                if (tipo === 'tv') gTv++;
+                else if (tipo === 'web') gWeb++;
+                else if (tipo === 'radio') gRadio++;
+                else if (tipo === 'prensa') gPrensa++;
+                else gOtro++;
+            });
+
+            let difusionLine = `📡 Difusión: 📺 TV: ${gTv} | 🌐 Web: ${gWeb} | 📻 Radio: ${gRadio} | 📰 Prensa: ${gPrensa}`;
+            if (gOtro > 0) difusionLine += ` | ❓ Otros: ${gOtro}`;
+
+            const resumenGrupo = `📊 *RESUMEN (${etiqueta})*: ${notasGrupo.length} notas | 🟢 ${gPos} positivas | 🟡 ${gNeu} neutras | 🔴 ${gNeg} negativas\n${difusionLine}`;
+
+            return `*${etiqueta}*\n${lineas.join('\n')}\n\n${resumenGrupo}`;
         });
 
-        // Conteo automático por tono, calculado solo a partir de los datos filtrados
+        // Conteo automático general por tono, calculado sobre todos los datos filtrados
         let pos = 0, neu = 0, neg = 0;
         currentFilteredData.forEach(row => {
             const t = (row.tono || '').toLowerCase();
@@ -491,7 +533,21 @@
             else neu++;
         });
         const total = currentFilteredData.length;
-        const resumenFinal = `📊 *RESUMEN*: ${total} notas | 🟢 ${pos} positivas | 🟡 ${neu} neutras | 🔴 ${neg} negativas`;
+
+        // Conteo general de difusión por canal
+        let totTv = 0, totWeb = 0, totRadio = 0, totPrensa = 0, totOtro = 0;
+        currentFilteredData.forEach(row => {
+            const tipo = getTipoAbreviado(row.tipoMedio);
+            if (tipo === 'tv') totTv++;
+            else if (tipo === 'web') totWeb++;
+            else if (tipo === 'radio') totRadio++;
+            else if (tipo === 'prensa') totPrensa++;
+            else totOtro++;
+        });
+        let difusionTotalLine = `📡 Difusión total: 📺 TV: ${totTv} | 🌐 Web: ${totWeb} | 📻 Radio: ${totRadio} | 📰 Prensa: ${totPrensa}`;
+        if (totOtro > 0) difusionTotalLine += ` | ❓ Otros: ${totOtro}`;
+
+        const resumenFinal = `📊 *RESUMEN GENERAL*: ${total} notas | 🟢 ${pos} positivas | 🟡 ${neu} neutras | 🔴 ${neg} negativas\n${difusionTotalLine}`;
 
         const textoCompleto = bloques.join('\n\n') + '\n\n' + resumenFinal;
 
