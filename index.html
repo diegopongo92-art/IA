@@ -56,6 +56,12 @@
         .btn-action:hover { opacity: 0.8; }
         .bg-gray { background: #64748b; }
         .bg-purple { background: #8b5cf6; } /* Color para el nuevo botón especial */
+        .bg-orange { background: #f97316; } /* Color para el botón de Rango personalizado */
+
+        .range-box { grid-column: 1 / -1; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 12px; display: none; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .range-box.visible { display: flex; }
+        .range-field { flex: 1; min-width: 140px; }
+        .range-field label { margin-bottom: 5px; }
 
         /* Estilos de Tabla Desktop */
         .table-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
@@ -75,6 +81,7 @@
         @media (max-width: 600px) {
             .date-controls { flex-wrap: wrap; }
             .date-controls input[type="date"] { width: 100%; flex: none; }
+            .range-field { min-width: 100%; }
         }
         
         @media (max-width: 768px) {
@@ -174,6 +181,7 @@
                 <button class="btn-action" onclick="setSoloHoy()" title="Noticias de hoy">Hoy</button>
                 <button class="btn-action bg-purple" onclick="setAyerYHoy()" title="Corte: Ayer tarde y Hoy">Ayer+Hoy</button>
                 <button class="btn-action bg-gray" onclick="verMes()" title="Noticias de este mes">Mes</button>
+                <button class="btn-action bg-orange" onclick="toggleRangoPersonalizado()" title="Elegir un rango de fechas (desde/hasta)">Rango</button>
                 <input type="date" id="filterFecha" onchange="onFechaChange()">
             </div>
         </div>
@@ -198,6 +206,16 @@
             <select id="filterTipoMedio" onchange="runFilters()">
                 <option value="">Todos</option>
             </select>
+        </div>
+        <div id="range-box" class="range-box">
+            <div class="range-field">
+                <label>Desde</label>
+                <input type="date" id="filterFechaDesde" onchange="onRangoPersonalizadoChange()">
+            </div>
+            <div class="range-field">
+                <label>Hasta</label>
+                <input type="date" id="filterFechaHasta" onchange="onRangoPersonalizadoChange()">
+            </div>
         </div>
     </div>
 
@@ -315,6 +333,7 @@
         
         currentMode = 'hoy';
         mostrarAyer = false; 
+        ocultarRangoPersonalizado();
         runFilters();
     }
 
@@ -324,6 +343,7 @@
         document.getElementById('filterHora').value = ''; // Ponemos 4 PM por defecto (puedes cambiarlo a mano si quieres)
         currentMode = 'rango_ayer_hoy'; 
         mostrarAyer = false; 
+        ocultarRangoPersonalizado();
         runFilters();
     }
 
@@ -332,6 +352,7 @@
         document.getElementById('filterHora').value = ''; 
         currentMode = 'month';
         mostrarAyer = false;
+        ocultarRangoPersonalizado();
         runFilters();
     }
 
@@ -348,6 +369,7 @@
             currentMode = val ? 'specific' : 'month'; 
             mostrarAyer = false;
         }
+        ocultarRangoPersonalizado();
         runFilters();
     }
 
@@ -355,6 +377,55 @@
         mostrarAyer = !mostrarAyer;
         runFilters();
     }
+
+    // ===== NUEVO: Rango de fechas personalizado (Desde / Hasta) =====
+    function toggleRangoPersonalizado() {
+        const box = document.getElementById('range-box');
+        const yaVisible = box.classList.contains('visible');
+
+        if (yaVisible) {
+            ocultarRangoPersonalizado();
+            currentMode = 'hoy';
+            const y = hoyDate.getFullYear();
+            const m = String(hoyDate.getMonth() + 1).padStart(2, '0');
+            const d = String(hoyDate.getDate()).padStart(2, '0');
+            document.getElementById('filterFecha').value = `${y}-${m}-${d}`;
+            runFilters();
+            return;
+        }
+
+        box.classList.add('visible');
+        document.getElementById('filterFecha').value = '';
+        document.getElementById('filterHora').value = '';
+        mostrarAyer = false;
+
+        // Si ya hay ambas fechas cargadas, activamos el filtro directo
+        const desde = document.getElementById('filterFechaDesde').value;
+        const hasta = document.getElementById('filterFechaHasta').value;
+        if (desde && hasta) {
+            currentMode = 'rango_personalizado';
+        } else {
+            currentMode = 'month'; // mientras elige el rango, no mostramos nada raro
+        }
+        runFilters();
+    }
+
+    function ocultarRangoPersonalizado() {
+        const box = document.getElementById('range-box');
+        box.classList.remove('visible');
+    }
+
+    function onRangoPersonalizadoChange() {
+        const desde = document.getElementById('filterFechaDesde').value;
+        const hasta = document.getElementById('filterFechaHasta').value;
+
+        if (desde && hasta) {
+            currentMode = 'rango_personalizado';
+            mostrarAyer = false;
+            runFilters();
+        }
+    }
+    // ===== FIN Rango de fechas personalizado =====
 
     function resetFilters() {
         const y = hoyDate.getFullYear();
@@ -367,6 +438,9 @@
         document.getElementById('filterEtiqueta').value = '';
         document.getElementById('filterTono').value = '';
         document.getElementById('filterTipoMedio').value = '';
+        document.getElementById('filterFechaDesde').value = '';
+        document.getElementById('filterFechaHasta').value = '';
+        ocultarRangoPersonalizado();
         
         currentMode = 'hoy';
         mostrarAyer = true; 
@@ -788,6 +862,8 @@
         const fechaInput = document.getElementById('filterFecha').value; 
         const horaInput = document.getElementById('filterHora').value; 
         const etiquetaPrevia = document.getElementById('filterEtiqueta').value;
+        const rangoDesdeInput = document.getElementById('filterFechaDesde').value;
+        const rangoHastaInput = document.getElementById('filterFechaHasta').value;
 
         let minMinutes = -1;
         if (horaInput) {
@@ -802,6 +878,18 @@
             btnAyer.innerHTML = mostrarAyer ? "➖ Ocultar notas de ayer (registradas hoy)" : "➕ Incluir notas de ayer (registradas hoy)";
         } else {
             btnAyerContainer.style.display = 'none';
+        }
+
+        let rangoDesdeTime = null, rangoHastaTime = null;
+        if (currentMode === 'rango_personalizado' && rangoDesdeInput && rangoHastaInput) {
+            const [yD, mD, dD] = rangoDesdeInput.split('-');
+            const [yH, mH, dH] = rangoHastaInput.split('-');
+            rangoDesdeTime = new Date(parseInt(yD), parseInt(mD) - 1, parseInt(dD)).getTime();
+            rangoHastaTime = new Date(parseInt(yH), parseInt(mH) - 1, parseInt(dH)).getTime();
+            // Por si el usuario invierte las fechas, las ordenamos solos
+            if (rangoDesdeTime > rangoHastaTime) {
+                const tmp = rangoDesdeTime; rangoDesdeTime = rangoHastaTime; rangoHastaTime = tmp;
+            }
         }
 
         const dateFiltered = allData.filter(row => {
@@ -829,6 +917,10 @@
                 const targetTime = new Date(parseInt(yInput), parseInt(mInput)-1, parseInt(dInput)).getTime();
                 return (rowTime === targetTime);
             } 
+            else if (currentMode === 'rango_personalizado') {
+                if (rangoDesdeTime === null || rangoHastaTime === null) return false;
+                return (rowTime >= rangoDesdeTime && rowTime <= rangoHastaTime);
+            }
             else if (currentMode === 'month') {
                 return (rY === hoyDate.getFullYear() && rM === hoyDate.getMonth());
             }
@@ -872,7 +964,7 @@
                     }
                     // Si es de hoy => matchHora = true (ya viene true por defecto)
                 } else {
-                    // Logica normal para Hoy, Fecha especifica, Mes
+                    // Logica normal para Hoy, Fecha especifica, Mes, Rango personalizado
                     if (rowMins !== -1 && rowMins < minMinutes) {
                         matchHora = false;
                     }
@@ -911,6 +1003,11 @@
         let textoConteo = currentMode === 'hoy' ? (mostrarAyer ? "Mostrando: Hoy + Rezagos de ayer" : "Mostrando: Solo Hoy") : 
                           currentMode === 'rango_ayer_hoy' ? "Mostrando: Ayer y Hoy" :
                           currentMode === 'specific' ? "Mostrando Fecha Seleccionada" : 
+                          currentMode === 'rango_personalizado' ? (() => {
+                                const d = document.getElementById('filterFechaDesde').value;
+                                const h = document.getElementById('filterFechaHasta').value;
+                                return (d && h) ? `Mostrando rango: ${d} a ${h}` : "Elige fecha 'Desde' y 'Hasta'";
+                          })() :
                           currentMode === 'month' ? "Mostrando: Este Mes" : "Mostrando Datos";
         
         if (horaInput) {
